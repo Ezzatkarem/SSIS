@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SSIS.DAL/SSIS.DAL.csproj" />
+  <Project Path="SSIS.Domain/SSIS.Domain.csproj" />
+  <Project Path="SSIS.PL/SSIS.PL.csproj" />
+  <Project Path="SSIS.PLL/SSIS.PLL.csproj" />
+</Solution>

@@ -1,0 +1,6 @@
+@SSIS.PL_HostAddress = http://localhost:5204
+
+GET {{SSIS.PL_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
