@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using SSIS.DAL.Data;
 using SSIS.DAL.Reposatory;
+using SSIS.DAL.Repositories;
 using SSIS.Domain.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
