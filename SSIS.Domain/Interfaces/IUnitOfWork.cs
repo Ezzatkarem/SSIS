@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,7 +8,8 @@ namespace SSIS.Domain.Interfaces
     {
         // Repositories
         IUserRepo Users { get; }
-        // IRepository<Course> Courses { get; }
+        ICourseRepository Courses { get; }
+        IEnrollmentRepository Enrollments { get; }
         // IRepository<Grade> Grades { get; }
         // IRepository<Attendance> Attendances { get; }
         // IRepository<Fee> Fees { get; }

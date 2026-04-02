@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SSIS.DAL.Data;
 using SSIS.DAL.Identity;       
-using SSIS.DAL.Reposatory;
 using SSIS.DAL.Repositories;
-using SSIS.DAL.UnitOfWork;
-using SSIS.Domain.Interfaces;
+using SSIS.DAL.Identity;
+using SSIS.Domain.Interfaces;        // ← ApplicationUser
+
 
 namespace SSIS.DAL.Extensions
 {
@@ -29,6 +29,8 @@ namespace SSIS.DAL.Extensions
             .AddDefaultTokenProviders();
 
             services.AddScoped<IUserRepo, UserRepo>();
+            services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
             services.AddScoped<IUnitOfWork, SSIS.DAL.UnitOfWork.UnitOfWork>();
 

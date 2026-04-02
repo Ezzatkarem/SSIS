@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SSIS.PLL.DTOs.Users;
-using SSIS.PLL.Interfaces;
-using SSIS.PLL.Services.Interfaces;
 
-namespace SSIS.PL.Controllers.v1  
+using SSIS.PLL.Services.Interfaces;
+using SSIS.BLL.DTOs.Users;
+using SSIS.BLL.Interfaces;
+using SSIS.BLL.Services.Interfaces; 
+
+namespace SSIS.PL.Controllers.v1    
 {
     [Route("api/v1/[controller]")]  
     [ApiController]

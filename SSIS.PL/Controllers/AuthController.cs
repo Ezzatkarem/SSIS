@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using SSIS.PLL.DTOs.Auth;
-using SSIS.PLL.DTOs.Login;
-using SSIS.PLL.Interfaces;
+
 using SSIS.PLL.Services.Interfaces;
+using SSIS.BLL.DTOs.Login;
+using SSIS.BLL.Interfaces;
+using SSIS.BLL.Services.Interfaces;
 namespace SSIS.PL.Controllers
 {
     [Route("api/[controller]")]

@@ -6,9 +6,10 @@ using FluentValidation.AspNetCore;
 
 using SSIS.DAL.SeedData;
 using SSIS.PL.Extensions;
-using SSIS.PLL.Extentions;
-using SSIS.PLL.Validators;
+
 using System.Text;
+using SSIS.BLL.Extentions;
+using SSIS.BLL.Validators;
 
 namespace SSIS.PL
 {
