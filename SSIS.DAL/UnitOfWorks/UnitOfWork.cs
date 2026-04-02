@@ -6,15 +6,15 @@ using SSIS.Domain.Interfaces;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SSIS.DAL.UnitOfWork  // ✅ namespace
+namespace SSIS.DAL.UnitOfWork 
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
-        private IDbContextTransaction? _transaction;  // ✅ nullable
+        private IDbContextTransaction? _transaction;
         private bool _disposed;
 
-        private IUserRepo? _userRepository;  // ✅ nullable
+        private IUserRepo? _userRepository;  
 
         public UnitOfWork(AppDbContext context)
         {

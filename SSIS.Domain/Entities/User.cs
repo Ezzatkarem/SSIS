@@ -1,9 +1,11 @@
 ﻿using SSIS.Domain.Common;
 using SSIS.Domain.Enum;
+
 namespace SSIS.Domain.Entities
 {
     public class User : BaseEntity, ISoftDelete
     {
+        //General
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public UserRole Role { get; set; }
@@ -13,13 +15,31 @@ namespace SSIS.Domain.Entities
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
 
-        // مسار الملف (يحتوي على البطاقة والشهادة)
-        public string? DocumentsFilePath { get; set; }
-
-        // حالة التوثيق
-        public bool IsVerified { get; set; } = false;
-
-        // ✅ ربط مع Identity User (لما نستخدم Identity)
         public string IdentityUserId { get; set; } = string.Empty;
+
+        //Student
+        public string? DocumentsFilePath { get; set; }      
+        public string NationalIdImagePath { get; set; }    
+        public bool IsVerified { get; set; } = false;       
+        public string? SecondarySchoolCertificatePath { get; set; }  
+         
+
+       // Doctor
+        public string? Title { get; set; }                  
+        public string? Specialization { get; set; }         
+        public int? YearsOfExperience { get; set; }         
+        public string? UniversityDegreePath { get; set; }   
+        public string? CvPath { get; set; }                
+
+        // Admin
+        public string? AdminCodeUsed { get; set; }    
+        // Conferm Email
+
+        public bool IsEmailConfirmed { get; set; } = false;
+        public string? EmailVerificationCode { get; set; }
+        public DateTime? EmailVerificationCodeExpiry { get; set; }
+       
+        public int EmailVerificationAttempts { get; set; }
+        public DateTime? LastEmailVerificationAttempt { get; set; }
     }
 }

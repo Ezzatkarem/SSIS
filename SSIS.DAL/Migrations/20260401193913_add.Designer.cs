@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSIS.DAL.Data;
 
@@ -11,9 +12,11 @@ using SSIS.DAL.Data;
 namespace SSIS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260401193913_add")]
+    partial class add
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -281,9 +284,6 @@ namespace SSIS.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EmailVerificationAttempts")
-                        .HasColumnType("int");
-
                     b.Property<string>("EmailVerificationCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -310,11 +310,7 @@ namespace SSIS.DAL.Migrations
                     b.Property<bool>("IsVerified")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("LastEmailVerificationAttempt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("NationalIdImagePath")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")

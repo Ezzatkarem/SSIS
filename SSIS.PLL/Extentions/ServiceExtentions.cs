@@ -1,8 +1,7 @@
-﻿// SSIS.PLL/Extensions/ServiceExtensions.cs
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SSIS.PLL.Services;
 using SSIS.PLL.Services.Interfaces;
-using SSIS.PLL.Interfaces;        // ← add this
+using SSIS.PLL.Interfaces;      
 
 namespace SSIS.PLL.Extentions
 {
@@ -11,7 +10,8 @@ namespace SSIS.PLL.Extentions
         public static IServiceCollection AddBLLServices(this IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IJwtService, JwtService>(); // ← ADD THIS
+            services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IEmailService, SSIS.PLL.Services.Implementaion.EmailService>();
             return services;
         }
     }

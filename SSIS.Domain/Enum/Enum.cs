@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SSIS.Domain.Enum
 {
-    public enum UserRole  // ← الاسم
+    public enum UserRole  
     {
         Admin = 1,
         Doctor = 2,

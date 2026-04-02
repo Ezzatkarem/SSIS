@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using SSIS.PLL.DTOs.Users;
 using SSIS.PLL.Interfaces;
-using SSIS.PLL.Services.Interfaces;  // ✅ صح
+using SSIS.PLL.Services.Interfaces;
 
-namespace SSIS.PL.Controllers.v1  // ✅ v1
+namespace SSIS.PL.Controllers.v1  
 {
-    [Route("api/v1/[controller]")]  // ✅ api/v1/users
+    [Route("api/v1/[controller]")]  
     [ApiController]
     public class UsersController : ControllerBase
     {

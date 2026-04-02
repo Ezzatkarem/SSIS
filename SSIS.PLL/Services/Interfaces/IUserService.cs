@@ -9,7 +9,7 @@ namespace SSIS.PLL.Services.Interfaces
     public interface  IUserService
     {
         Task<LoginResponseDto?> LoginAsync(LoginRequestDto request);
-        Task<UserResponseDto?> RegisterAsync(RegisterRequestDto request);  // ← أضف هذا
+        Task<(UserResponseDto? Data, string[] Errors)> RegisterAsync(RegisterRequestDto request);
 
 
 
@@ -23,7 +23,9 @@ namespace SSIS.PLL.Services.Interfaces
         Task<bool> VerifyUserAsync(Guid id);
         Task<bool> RejectUserAsync(Guid id, string? rejectionReason = null);
 
-
+        Task<(bool seccess, string message)> SendEmailVerificationCodeAsync(string email);
+            Task<(bool seccess, string message)> VerifyEmailCodeAsync(string email, string code);
+        Task<(bool seccess, string message)> ResendEmailVerificationCodeAsync(string email);
 
     }
 }

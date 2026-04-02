@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using SSIS.PLL.DTOs.Auth;
 using SSIS.PLL.DTOs.Login;
 using SSIS.PLL.Interfaces;
 using SSIS.PLL.Services.Interfaces;
@@ -17,19 +18,18 @@ namespace SSIS.PL.Controllers
             _userService = userService;
             _webHostEnvironment = webHostEnvironment;
         }
-        // POST: api/v1/auth/register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterRequestDto request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _userService.RegisterAsync(request);
+            var (data, errors) = await _userService.RegisterAsync(request);
 
-            if (result == null)
-                return BadRequest(new { message = "Email already exists" });
+            if (errors.Length > 0)
+                return BadRequest(new { errors });
 
-            return Ok(result);
+            return Ok(data);
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
@@ -45,6 +45,27 @@ namespace SSIS.PL.Controllers
             return Ok(result);
         }
 
+        [HttpPost("send-verification-code")]
+        public async Task<IActionResult> SendVerificationCode([FromBody]string email)
+        {
+            var (seccess,message)=await _userService.SendEmailVerificationCodeAsync(email);
+            if(!seccess) return BadRequest(new {message});
+            return Ok(new {message});
 
+        }
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail ([FromBody] VerifyCodeRequest Request)
+        {
+            var (seccess, message) = await _userService.VerifyEmailCodeAsync(Request.Email,Request.Code);
+            if (!seccess) return BadRequest(new { message });    
+            return Ok(new {message});
+        }
+        [HttpPost("resend-code")]
+        public async Task<IActionResult> ResendCode([FromBody] string email)
+        {
+            var (seccess, message) = await _userService.ResendEmailVerificationCodeAsync(email);
+            if (!seccess) return BadRequest(new { message });
+            return Ok(new { message });
+        }
     }
 }

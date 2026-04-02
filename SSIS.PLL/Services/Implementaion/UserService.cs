@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
 using SSIS.DAL.Identity;
+using SSIS.DAL.Repositories;
 using SSIS.Domain.Entities;
+using SSIS.Domain.Enum;
 using SSIS.Domain.Interfaces;
 using SSIS.PLL.DTOs.Login;
 using SSIS.PLL.DTOs.Users;
@@ -19,6 +21,9 @@ namespace SSIS.PLL.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IJwtService _jwtService;
         private readonly IHostEnvironment _hostEnvironment;
+        private readonly IEmailService emailService;
+        private readonly int MaxEmailCodeAttempts = 5;
+
 
         public UserService(
             UserManager<ApplicationUser> userManager,
@@ -26,7 +31,8 @@ namespace SSIS.PLL.Services
             IUserRepo userRepository,
             IUnitOfWork unitOfWork,
             IJwtService jwtService,
-            IHostEnvironment hostEnvironment)
+            IHostEnvironment hostEnvironment,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -34,26 +40,23 @@ namespace SSIS.PLL.Services
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
             _hostEnvironment = hostEnvironment;
+            this.emailService = emailService;
         }
 
         public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
         {
-            // 1. تسجيل الدخول باستخدام Identity
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
                 return null;
 
-            // 2. التحقق من كلمة المرور
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
             if (!result.Succeeded)
                 return null;
 
-            // 3. جلب Domain User
             var domainUser = await _userRepository.GetByIdentityUserIdAsync(user.Id.ToString());
             if (domainUser == null || !domainUser.IsActive || domainUser.IsDeleted)
                 return null;
 
-            // 4. توليد Token
             var token = _jwtService.GenerateToken(domainUser);
 
             return new LoginResponseDto
@@ -66,33 +69,51 @@ namespace SSIS.PLL.Services
             };
         }
 
-        public async Task<UserResponseDto?> RegisterAsync(RegisterRequestDto request)
+        public async Task<(UserResponseDto? Data, string[] Errors)> RegisterAsync(RegisterRequestDto request)
         {
-            // 1. حفظ الملف
-            string? documentsPath = null;
-            if (request.DocumentsFile != null)
+            string? nationalIdPath = null;
+            string? secondaryCertificatePath = null;
+            string? universityDegreePath = null;
+            string? cvPath = null;
+
+            if (request.NationalIdImage != null)
+                nationalIdPath = await SaveFileAsync(request.NationalIdImage, "national-ids");
+
+            if (request.Role == UserRole.Student && request.SecondarySchoolCertificate != null)
+                secondaryCertificatePath = await SaveFileAsync(request.SecondarySchoolCertificate, "certificates");
+
+            if (request.Role == UserRole.Doctor)
             {
-                documentsPath = await SaveFileAsync(request.DocumentsFile, "student-documents");
+                if (request.UniversityDegree != null)
+                    universityDegreePath = await SaveFileAsync(request.UniversityDegree, "degrees");
+                if (request.Cv != null)
+                    cvPath = await SaveFileAsync(request.Cv, "cvs");
             }
 
-            // 2. إنشاء ApplicationUser (Identity)
             var identityUser = new ApplicationUser
             {
                 UserName = request.Email,
                 Email = request.Email,
                 FullName = request.FullName,
-                DocumentsFilePath = documentsPath,
-                IsVerified = false
+                PhoneNumber = request.PhoneNumber
             };
+            if (request.Password != request.ConfirmPassword)
+                return (null, new[] { "Passwords do not match" });
+            var result = await _userManager.CreateAsync(identityUser, request.Password);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description).ToArray();
+                return (null, errors);
+            }
 
-            var createResult = await _userManager.CreateAsync(identityUser, request.Password);
-            if (!createResult.Succeeded)
-                return null;
+            var roleResult = await _userManager.AddToRoleAsync(identityUser, request.Role.ToString());
+            if (!roleResult.Succeeded)
+            {
+                var errors = roleResult.Errors.Select(e => e.Description).ToArray();
+                await _userManager.DeleteAsync(identityUser);
+                return (null, errors);
+            }
 
-            // 3. إضافة Role
-            await _userManager.AddToRoleAsync(identityUser, request.Role.ToString());
-
-            // 4. إنشاء Domain User
             var domainUser = new User
             {
                 Id = Guid.NewGuid(),
@@ -101,26 +122,34 @@ namespace SSIS.PLL.Services
                 Role = request.Role,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
-                DocumentsFilePath = documentsPath,
-                IsVerified = false,
                 IdentityUserId = identityUser.Id.ToString(),
+                PhoneNumber = request.PhoneNumber,
+                NationalIdImagePath = nationalIdPath,
+                SecondarySchoolCertificatePath = secondaryCertificatePath,
+                Title = request.Role == UserRole.Doctor ? request.Title : null,
+                Specialization = request.Role == UserRole.Doctor ? request.Specialization : null,
+                YearsOfExperience = request.Role == UserRole.Doctor ? request.YearsOfExperience : null,
+                UniversityDegreePath = universityDegreePath,
+                CvPath = cvPath,
+                AdminCodeUsed = request.Role == UserRole.Admin ? request.AdminCode : null,
+                IsEmailConfirmed = false
             };
 
             await _userRepository.AddAsync(domainUser);
             await _unitOfWork.SaveChangesAsync();
 
-            return new UserResponseDto
+            var response = new UserResponseDto
             {
                 Id = domainUser.Id,
                 FullName = domainUser.FullName,
                 Email = domainUser.Email,
                 Role = domainUser.Role,
                 IsActive = domainUser.IsActive,
-                IsVerified = domainUser.IsVerified,
                 CreatedAt = domainUser.CreatedAt
             };
-        }
 
+            return (response, Array.Empty<string>());
+        }
         public async Task<UserResponseDto?> GetByIdAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -175,7 +204,6 @@ namespace SSIS.PLL.Services
             await _userRepository.UpdateAsync(user);
             await _unitOfWork.SaveChangesAsync();
 
-            // تحديث ApplicationUser أيضًا
             if (!string.IsNullOrEmpty(user.IdentityUserId))
             {
                 var identityUser = await _userManager.FindByIdAsync(user.IdentityUserId);
@@ -204,10 +232,8 @@ namespace SSIS.PLL.Services
             if (user == null)
                 return false;
 
-            // Soft Delete في Domain User
             await _userRepository.SoftDeleteAsync(id);
 
-            // Soft Delete في ApplicationUser (Identity)
             if (!string.IsNullOrEmpty(user.IdentityUserId))
             {
                 var identityUser = await _userManager.FindByIdAsync(user.IdentityUserId);
@@ -267,7 +293,6 @@ namespace SSIS.PLL.Services
 
             await _userRepository.UpdateAsync(user);
 
-            // تحديث ApplicationUser
             if (!string.IsNullOrEmpty(user.IdentityUserId))
             {
                 var identityUser = await _userManager.FindByIdAsync(user.IdentityUserId);
@@ -288,7 +313,6 @@ namespace SSIS.PLL.Services
             if (user == null || user.IsDeleted)
                 return false;
 
-            // مسح الملف
             if (!string.IsNullOrEmpty(user.DocumentsFilePath))
             {
                 string fullPath = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot", user.DocumentsFilePath);
@@ -304,7 +328,6 @@ namespace SSIS.PLL.Services
 
             await _userRepository.UpdateAsync(user);
 
-            // تحديث ApplicationUser
             if (!string.IsNullOrEmpty(user.IdentityUserId))
             {
                 var identityUser = await _userManager.FindByIdAsync(user.IdentityUserId);
@@ -338,6 +361,82 @@ namespace SSIS.PLL.Services
             }
 
             return Path.Combine("uploads", folderName, uniqueFileName).Replace("\\", "/");
+        }
+        public async Task<(bool seccess,string message )> SendEmailVerificationCodeAsync(string email)
+        {
+            var user=await _userRepository.GetByEmailAsync(email);
+            if (user == null)
+                return (false, "User not found");
+
+            if (user.IsEmailConfirmed)
+                return (false, "Email already verified");
+
+            var code = GenerateVerificationCode();
+                user.EmailVerificationAttempts = 0;
+            user.EmailVerificationCode = code;
+            user.EmailVerificationCodeExpiry = DateTime.UtcNow.AddMinutes(5);
+            user.LastEmailVerificationAttempt = DateTime.UtcNow;
+            await _userRepository.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+            var body = $"<h1>Your code: {code}</h1><p>Valid for 15 min</p>";
+            await emailService.SendEmailASync(email, "Verification Code", body);
+            return (true, "Code sent");
+        }
+
+       public async Task<(bool seccess,string message)> VerifyEmailCodeAsync(string email,string code)
+        {
+            var user =await _userRepository.GetByEmailAsync(email);
+            if (user == null)
+                return (false, "User not found");
+
+            if (user.IsEmailConfirmed)
+                return (false, "Email already verified");
+            if (user.EmailVerificationCodeExpiry < DateTime.UtcNow)
+                return (false, "Code expired");
+            if (user.EmailVerificationAttempts >= MaxEmailCodeAttempts)
+                return (false, "Too many failed attempts");
+            if(user.EmailVerificationCode!=code)
+            {
+                user.EmailVerificationAttempts++;
+                await _userRepository.UpdateAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+                return (false, "Invalid Code");
+
+            }
+            user.IsEmailConfirmed = true;
+            user.EmailVerificationCode = null;
+            user.EmailVerificationAttempts = 0;
+            user.EmailVerificationCodeExpiry = null;
+            await _userRepository.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+            var identityUser = await _userManager.FindByEmailAsync(email);
+            if (identityUser != null)
+            {
+                identityUser.EmailConfirmed = true;
+                await _userManager.UpdateAsync(identityUser);
+            }
+            return (true, "Email verified");
+
+
+
+        }
+        public async Task<(bool seccess,string message)> ResendEmailVerificationCodeAsync(string email)
+        {
+            var user = await _userRepository.GetByEmailAsync(email);
+            if (user == null)
+                return (false, "User not found");
+
+            if (user.IsEmailConfirmed)
+                return (false, "Email already verified");
+            if (user.LastEmailVerificationAttempt?.AddMinutes(10) > DateTime.UtcNow)
+                return (false, "Please wait 10 minute");
+            return await SendEmailVerificationCodeAsync(email);
+
+
+        }
+        private string GenerateVerificationCode()
+        {
+            return new Random().Next(100000, 999999).ToString();
         }
     }
 }

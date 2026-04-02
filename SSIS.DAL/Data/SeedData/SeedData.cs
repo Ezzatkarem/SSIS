@@ -18,10 +18,8 @@ namespace SSIS.DAL.SeedData
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
-            // 1. إنشاء قاعدة البيانات لو مش موجودة
             await context.Database.EnsureCreatedAsync();
 
-            // 2. إنشاء الأدوار (Roles)
             string[] roles = { "Admin", "Doctor", "Student" };
 
             foreach (var role in roles)
@@ -32,7 +30,6 @@ namespace SSIS.DAL.SeedData
                 }
             }
 
-            // 3. إنشاء مستخدم Admin (Identity + Domain)
             var adminEmail = "admin@system.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
@@ -50,7 +47,6 @@ namespace SSIS.DAL.SeedData
                 {
                     await userManager.AddToRoleAsync(adminUser, "Admin");
 
-                    // إنشاء Domain User مرتبط
                     var domainAdmin = new User
                     {
                         Id = Guid.NewGuid(),
@@ -65,7 +61,6 @@ namespace SSIS.DAL.SeedData
                 }
             }
 
-            // 4. إنشاء مستخدم Doctor (Identity + Domain)
             var doctorEmail = "doctor@system.com";
             var doctorUser = await userManager.FindByEmailAsync(doctorEmail);
             if (doctorUser == null)
@@ -97,7 +92,6 @@ namespace SSIS.DAL.SeedData
                 }
             }
 
-            // 5. إنشاء مستخدم Student (Identity + Domain)
             var studentEmail = "student@system.com";
             var studentUser = await userManager.FindByEmailAsync(studentEmail);
             if (studentUser == null)
@@ -129,7 +123,6 @@ namespace SSIS.DAL.SeedData
                 }
             }
 
-            // حفظ التغييرات في جدول Users
             await context.SaveChangesAsync();
         }
     }
