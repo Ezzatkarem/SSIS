@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SSIS.DAL.Data;
 using SSIS.DAL.Identity;        // ← ApplicationUser
-using SSIS.DAL.Reposatory;
+
 using SSIS.DAL.Repositories;
 using SSIS.DAL.UnitOfWork;
 using SSIS.Domain.Interfaces;
@@ -32,6 +32,8 @@ namespace SSIS.DAL.Extensions
 
             // ✅ 3. Repositories
             services.AddScoped<IUserRepo, UserRepo>();
+            services.AddScoped<ICourseRepository, CourseRepository>();
+            services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
             // ✅ 4. UnitOfWork
             services.AddScoped<IUnitOfWork, SSIS.DAL.UnitOfWork.UnitOfWork>();

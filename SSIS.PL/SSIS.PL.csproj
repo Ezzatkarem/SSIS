@@ -22,7 +22,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\SSIS.DAL\SSIS.DAL.csproj" />
-		<ProjectReference Include="..\SSIS.PLL\SSIS.PLL.csproj" />
+		<ProjectReference Include="..\SSIS.BLL\SSIS.BLL.csproj" />
 	</ItemGroup>
 
 </Project>

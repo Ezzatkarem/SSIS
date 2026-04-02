@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SSIS.PLL.DTOs.Users;
-using SSIS.PLL.Interfaces;
-using SSIS.PLL.Services.Interfaces;  // ✅ صح
+using SSIS.BLL.DTOs.Users;
+using SSIS.BLL.Interfaces;
+using SSIS.BLL.Services.Interfaces;  // ✅ صح
 
 namespace SSIS.PL.Controllers.v1  // ✅ v1
 {

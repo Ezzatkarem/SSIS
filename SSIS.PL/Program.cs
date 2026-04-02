@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using SSIS.DAL.Extensions;
 using SSIS.DAL.SeedData;
 using SSIS.PL.Extensions;
-using SSIS.PLL.Extentions;
+using SSIS.BLL.Extentions;
 using System.Text;
 
 namespace SSIS.PL

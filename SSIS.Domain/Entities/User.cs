@@ -1,4 +1,4 @@
-﻿using SSIS.Domain.Common;
+using SSIS.Domain.Common;
 using SSIS.Domain.Enum;
 namespace SSIS.Domain.Entities
 {
@@ -21,5 +21,9 @@ namespace SSIS.Domain.Entities
 
         // ✅ ربط مع Identity User (لما نستخدم Identity)
         public string IdentityUserId { get; set; } = string.Empty;
+
+        // Navigation properties for Phase 2
+        public ICollection<Course> TaughtCourses { get; set; } = new List<Course>();
+        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
     }
 }

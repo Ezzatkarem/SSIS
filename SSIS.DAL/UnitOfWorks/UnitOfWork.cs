@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage;
 using SSIS.DAL.Data;
-using SSIS.DAL.Reposatory;
+
 using SSIS.DAL.Repositories;
 using SSIS.Domain.Interfaces;
 using System.Threading;
@@ -15,6 +15,8 @@ namespace SSIS.DAL.UnitOfWork  // ✅ namespace
         private bool _disposed;
 
         private IUserRepo? _userRepository;  // ✅ nullable
+        private ICourseRepository? _courseRepository;
+        private IEnrollmentRepository? _enrollmentRepository;
 
         public UnitOfWork(AppDbContext context)
         {
@@ -22,6 +24,8 @@ namespace SSIS.DAL.UnitOfWork  // ✅ namespace
         }
 
         public IUserRepo Users => _userRepository ??= new UserRepo(_context);
+        public ICourseRepository Courses => _courseRepository ??= new CourseRepository(_context);
+        public IEnrollmentRepository Enrollments => _enrollmentRepository ??= new EnrollmentRepository(_context);
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
