@@ -17,7 +17,6 @@ namespace SSIS.Domain.Entities
 
         public string IdentityUserId { get; set; } = string.Empty;
 
-<<<<<<< HEAD
         //Student
         public string? DocumentsFilePath { get; set; }      
         public string NationalIdImagePath { get; set; }    
@@ -42,10 +41,8 @@ namespace SSIS.Domain.Entities
        
         public int EmailVerificationAttempts { get; set; }
         public DateTime? LastEmailVerificationAttempt { get; set; }
-=======
         // Navigation properties for Phase 2
         public ICollection<Course> TaughtCourses { get; set; } = new List<Course>();
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
->>>>>>> 8539c9cf9ed67bd15cfd40abed9d5cdac2370467
     }
 }

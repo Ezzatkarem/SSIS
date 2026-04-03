@@ -2,7 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using SSIS.BLL.Services;
 using SSIS.BLL.Services.Interfaces;
-using SSIS.BLL.Interfaces;        // ← add this
+using SSIS.BLL.Interfaces;
+using SSIS.PLL.Services.Interfaces;        // ← add this
 
 namespace SSIS.BLL.Extentions
 {
@@ -12,6 +13,7 @@ namespace SSIS.BLL.Extentions
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IEmailService, SSIS.PLL.Services.Implementaion.EmailService>();
             
             // Phase 2 Services
             services.AddScoped<ICourseService, SSIS.BLL.Services.Implementation.CourseService>();

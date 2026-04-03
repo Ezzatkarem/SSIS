@@ -10,6 +10,7 @@ using SSIS.BLL.DTOs.Login;
 using SSIS.BLL.DTOs.Users;
 using SSIS.BLL.Interfaces;
 using SSIS.BLL.Services.Interfaces;
+using SSIS.PLL.Services.Interfaces;
 
 namespace SSIS.BLL.Services
 {
