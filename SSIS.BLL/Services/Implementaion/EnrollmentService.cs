@@ -17,6 +17,7 @@ namespace SSIS.BLL.Services.Implementation
             _userRepository = userRepository;
         }
 
+        #region EnrollAsync
         public async Task<EnrollmentDto?> EnrollAsync(CreateEnrollmentDto dto)
         {
             // Verify student exists and has Student role
@@ -48,7 +49,9 @@ namespace SSIS.BLL.Services.Implementation
 
             return MapToDto(enrollment);
         }
+        #endregion
 
+        #region UnenrollAsync
         public async Task<bool> UnenrollAsync(Guid enrollmentId)
         {
             var enrollment = await _unitOfWork.Enrollments.GetByIdAsync(enrollmentId);
@@ -64,7 +67,9 @@ namespace SSIS.BLL.Services.Implementation
 
             return true;
         }
+        #endregion
 
+        #region GetStudentCoursesAsync
         public async Task<StudentCoursesDto?> GetStudentCoursesAsync(Guid studentId)
         {
             var student = await _userRepository.GetByIdAsync(studentId);
@@ -87,7 +92,9 @@ namespace SSIS.BLL.Services.Implementation
                 }).ToList()
             };
         }
+        #endregion
 
+        #region GetCourseStudentsAsync
         public async Task<CourseStudentsDto?> GetCourseStudentsAsync(Guid courseId)
         {
             var course = await _unitOfWork.Courses.GetByIdAsync(courseId);
@@ -110,12 +117,16 @@ namespace SSIS.BLL.Services.Implementation
                 }).ToList()
             };
         }
+        #endregion
 
+        #region CheckEnrollmentAsync
         public async Task<bool> CheckEnrollmentAsync(Guid studentId, Guid courseId)
         {
             return await _unitOfWork.Enrollments.ExistsAsync(studentId, courseId);
         }
+        #endregion
 
+        #region GetByIdAsync
         public async Task<EnrollmentDto?> GetByIdAsync(Guid id)
         {
             var enrollment = await _unitOfWork.Enrollments.GetByIdAsync(id);
@@ -125,6 +136,7 @@ namespace SSIS.BLL.Services.Implementation
             return MapToDto(enrollment);
         }
 
+        #endregion
         private EnrollmentDto MapToDto(Enrollment enrollment)
         {
             return new EnrollmentDto

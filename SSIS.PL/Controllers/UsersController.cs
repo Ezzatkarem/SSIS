@@ -19,6 +19,7 @@ namespace SSIS.PL.Controllers.v1
             _userService = userService;
         }
 
+        #region GetAll
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
@@ -26,9 +27,11 @@ namespace SSIS.PL.Controllers.v1
             var result = await _userService.GetAllAsync();
             return Ok(result);
         }
+        #endregion
 
+        #region GetById
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var user = await _userService.GetByIdAsync(id);
@@ -38,9 +41,11 @@ namespace SSIS.PL.Controllers.v1
             }
             return Ok(user);
         }
+        #endregion
 
+        #region Update
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize (Roles ="Admin")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequestDto request)
         {
             if (!ModelState.IsValid)
@@ -53,7 +58,9 @@ namespace SSIS.PL.Controllers.v1
             }
             return Ok(user);
         }
+        #endregion
 
+        #region Delete
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid id)
@@ -65,6 +72,8 @@ namespace SSIS.PL.Controllers.v1
             }
             return Ok(new { message = "User deleted successfully" });
         }
+        #endregion
+        #region ChangePassword
 
         [HttpPost("{id}/change-password")]
         [Authorize]
@@ -79,6 +88,7 @@ namespace SSIS.PL.Controllers.v1
                 return NotFound(new { message = $"User with ID {id} not found" });
             }
             return Ok(new { message = "Password changed successfully" });
-        }
+        } 
+        #endregion
     }
 }

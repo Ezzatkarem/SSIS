@@ -17,6 +17,7 @@ namespace SSIS.BLL.Services.Implementation
             _userRepository = userRepository;
         }
 
+        #region CreateAsync
         public async Task<CourseDto?> CreateAsync(CreateCourseDto dto)
         {
             // Check if code already exists
@@ -42,6 +43,8 @@ namespace SSIS.BLL.Services.Implementation
             return MapToDto(course);
         }
 
+        #endregion
+        #region UpdateAsync
         public async Task<CourseDto?> UpdateAsync(Guid id, UpdateCourseDto dto)
         {
             var course = await _unitOfWork.Courses.GetByIdAsync(id);
@@ -59,7 +62,9 @@ namespace SSIS.BLL.Services.Implementation
 
             return MapToDto(course);
         }
+        #endregion
 
+        #region DeleteAsync
         public async Task<bool> DeleteAsync(Guid id)
         {
             var course = await _unitOfWork.Courses.GetByIdAsync(id);
@@ -79,6 +84,8 @@ namespace SSIS.BLL.Services.Implementation
             return true;
         }
 
+        #endregion
+        #region GetByIdAsync
         public async Task<CourseDto?> GetByIdAsync(Guid id)
         {
             var course = await _unitOfWork.Courses.GetByIdAsync(id);
@@ -87,19 +94,25 @@ namespace SSIS.BLL.Services.Implementation
 
             return MapToDto(course);
         }
+        #endregion
 
+        #region GetAllAsync
         public async Task<IReadOnlyList<CourseDto>> GetAllAsync()
         {
             var courses = await _unitOfWork.Courses.GetAllAsync();
             return courses.Where(c => !c.IsDeleted).Select(MapToDto).ToList();
         }
+        #endregion
 
+        #region GetByDoctorAsync
         public async Task<IReadOnlyList<CourseDto>> GetByDoctorAsync(Guid doctorId)
         {
             var courses = await _unitOfWork.Courses.GetByDoctorAsync(doctorId);
             return courses.Select(MapToDto).ToList();
         }
+        #endregion
 
+        #region AssignDoctorAsync
         public async Task<bool> AssignDoctorAsync(Guid courseId, Guid doctorId)
         {
             var course = await _unitOfWork.Courses.GetByIdAsync(courseId);
@@ -119,12 +132,15 @@ namespace SSIS.BLL.Services.Implementation
 
             return true;
         }
+        #endregion
 
+        #region GetActiveCoursesAsync
         public async Task<IReadOnlyList<CourseDto>> GetActiveCoursesAsync()
         {
             var courses = await _unitOfWork.Courses.GetActiveCoursesAsync();
             return courses.Select(MapToDto).ToList();
-        }
+        } 
+        #endregion
 
         private CourseDto MapToDto(Course course)
         {

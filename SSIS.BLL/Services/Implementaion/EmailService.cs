@@ -17,6 +17,7 @@ namespace SSIS.PLL.Services.Implementaion
         {
             this.configuration = configuration;
         }
+        #region SendEmailASync
         public async Task SendEmailASync(string toemail, string Subject, string Body)
         {
             var email = new MimeMessage();
@@ -43,6 +44,7 @@ namespace SSIS.PLL.Services.Implementaion
             await stmp.SendAsync(email);
             await stmp.DisconnectAsync(true);
 
-        }
+        } 
+        #endregion
     }
 }

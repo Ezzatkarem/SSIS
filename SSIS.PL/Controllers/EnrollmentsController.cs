@@ -17,6 +17,7 @@ namespace SSIS.PL.Controllers
             _enrollmentService = enrollmentService;
         }
 
+        #region Enroll
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Enroll([FromBody] CreateEnrollmentDto dto)
@@ -30,7 +31,9 @@ namespace SSIS.PL.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = enrollment.Id }, enrollment);
         }
+        #endregion
 
+        #region Unenroll
         [HttpDelete("{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Unenroll(Guid id)
@@ -41,7 +44,9 @@ namespace SSIS.PL.Controllers
 
             return NoContent();
         }
+        #endregion
 
+        #region GetById
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -51,7 +56,9 @@ namespace SSIS.PL.Controllers
 
             return Ok(enrollment);
         }
+        #endregion
 
+        #region GetStudentCourses
         [HttpGet("student/{studentId:guid}")]
         public async Task<IActionResult> GetStudentCourses(Guid studentId)
         {
@@ -61,7 +68,9 @@ namespace SSIS.PL.Controllers
 
             return Ok(result);
         }
+        #endregion
 
+        #region GetCourseStudents
         [HttpGet("course/{courseId:guid}")]
         public async Task<IActionResult> GetCourseStudents(Guid courseId)
         {
@@ -71,12 +80,15 @@ namespace SSIS.PL.Controllers
 
             return Ok(result);
         }
+        #endregion
 
+        #region CheckEnrollment
         [HttpGet("check")]
         public async Task<IActionResult> CheckEnrollment([FromQuery] Guid studentId, [FromQuery] Guid courseId)
         {
             var isEnrolled = await _enrollmentService.CheckEnrollmentAsync(studentId, courseId);
             return Ok(new { isEnrolled });
-        }
+        } 
+        #endregion
     }
 }

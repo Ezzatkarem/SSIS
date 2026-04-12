@@ -20,6 +20,7 @@ namespace SSIS.PL.Controllers
             _userService = userService;
             _webHostEnvironment = webHostEnvironment;
         }
+        #region Register
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] RegisterRequestDto request)
         {
@@ -33,6 +34,10 @@ namespace SSIS.PL.Controllers
 
             return Ok(data);
         }
+        #endregion
+
+
+        #region Login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
@@ -46,28 +51,37 @@ namespace SSIS.PL.Controllers
 
             return Ok(result);
         }
+        #endregion
 
+        #region SendVerificationCode
         [HttpPost("send-verification-code")]
-        public async Task<IActionResult> SendVerificationCode([FromBody]string email)
+        public async Task<IActionResult> SendVerificationCode([FromBody] string email)
         {
-            var (seccess,message)=await _userService.SendEmailVerificationCodeAsync(email);
-            if(!seccess) return BadRequest(new {message});
-            return Ok(new {message});
+            var (seccess, message) = await _userService.SendEmailVerificationCodeAsync(email);
+            if (!seccess) return BadRequest(new { message });
+            return Ok(new { message });
 
-        }
+        } 
+        #endregion
+
+        #region VerifyEmail
         [HttpPost("verify-email")]
-        public async Task<IActionResult> VerifyEmail ([FromBody] VerifyCodeRequest Request)
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyCodeRequest Request)
         {
-            var (seccess, message) = await _userService.VerifyEmailCodeAsync(Request.Email,Request.Code);
-            if (!seccess) return BadRequest(new { message });    
-            return Ok(new {message});
+            var (seccess, message) = await _userService.VerifyEmailCodeAsync(Request.Email, Request.Code);
+            if (!seccess) return BadRequest(new { message });
+            return Ok(new { message });
         }
+        #endregion
+
+        #region ResendCode
         [HttpPost("resend-code")]
         public async Task<IActionResult> ResendCode([FromBody] string email)
         {
             var (seccess, message) = await _userService.ResendEmailVerificationCodeAsync(email);
             if (!seccess) return BadRequest(new { message });
             return Ok(new { message });
-        }
+        } 
+        #endregion
     }
 }

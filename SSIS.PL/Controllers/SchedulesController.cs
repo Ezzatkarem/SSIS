@@ -17,13 +17,16 @@ namespace SSIS.PL.Controllers
             _scheduleService = scheduleService;
         }
 
+        #region GetAll
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var schedules = await _scheduleService.GetAllAsync();
             return Ok(schedules);
         }
+        #endregion
 
+        #region GetById
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -33,14 +36,18 @@ namespace SSIS.PL.Controllers
 
             return Ok(schedule);
         }
+        #endregion
 
+        #region GetByCourse
         [HttpGet("course/{courseId:guid}")]
         public async Task<IActionResult> GetByCourse(Guid courseId)
         {
             var schedules = await _scheduleService.GetByCourseAsync(courseId);
             return Ok(schedules);
         }
+        #endregion
 
+        #region Create
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateScheduleDto dto)
@@ -54,7 +61,9 @@ namespace SSIS.PL.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = schedule.Id }, schedule);
         }
+        #endregion
 
+        #region Update
         [HttpPut("{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateScheduleDto dto)
@@ -68,7 +77,9 @@ namespace SSIS.PL.Controllers
 
             return Ok(schedule);
         }
+        #endregion
 
+        #region Delete
         [HttpDelete("{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid id)
@@ -78,6 +89,7 @@ namespace SSIS.PL.Controllers
                 return NotFound(new { message = "Schedule not found" });
 
             return NoContent();
-        }
+        } 
+        #endregion
     }
 }

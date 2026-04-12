@@ -44,6 +44,7 @@ namespace SSIS.BLL.Services
             this.emailService = emailService;
         }
 
+        #region LoginAsync
         public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
@@ -69,7 +70,9 @@ namespace SSIS.BLL.Services
                 ExpiresAt = DateTime.UtcNow.AddHours(8)
             };
         }
+        #endregion
 
+        #region RegisterAsync
         public async Task<(UserResponseDto? Data, string[] Errors)> RegisterAsync(RegisterRequestDto request)
         {
             string? nationalIdPath = null;
@@ -150,7 +153,32 @@ namespace SSIS.BLL.Services
             };
 
             return (response, Array.Empty<string>());
+        } 
+        #endregion
+
+        #region SaveFileAsync 
+        private async Task<string> SaveFileAsync(IFormFile file, string folderName)
+        {
+            string uploadsFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot", "uploads", folderName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+
+            return Path.Combine("uploads", folderName, uniqueFileName).Replace("\\", "/");
         }
+        #endregion
+
+        #region GetByIdAsync
         public async Task<UserResponseDto?> GetByIdAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -168,7 +196,9 @@ namespace SSIS.BLL.Services
                 CreatedAt = user.CreatedAt
             };
         }
+        #endregion
 
+        #region GetAllAsync
         public async Task<IReadOnlyList<UserResponseDto>> GetAllAsync()
         {
             var users = await _userRepository.GetAllAsync();
@@ -187,7 +217,9 @@ namespace SSIS.BLL.Services
                 })
                 .ToList();
         }
+        #endregion
 
+        #region UpdateAsync
         public async Task<UserResponseDto?> UpdateAsync(Guid id, UpdateUserRequestDto request)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -226,7 +258,9 @@ namespace SSIS.BLL.Services
                 CreatedAt = user.CreatedAt
             };
         }
+        #endregion
 
+        #region DeleteAsync
         public async Task<bool> DeleteAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -249,7 +283,9 @@ namespace SSIS.BLL.Services
             await _unitOfWork.SaveChangesAsync();
             return true;
         }
+        #endregion
 
+        #region ChangePasswordAsync
         public async Task<bool> ChangePasswordAsync(Guid id, ChangePasswordRequestDto request)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -273,7 +309,10 @@ namespace SSIS.BLL.Services
 
             return true;
         }
+        #endregion
 
+
+        #region GetDocumentsUrlAsync
         public async Task<string?> GetDocumentsUrlAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -282,7 +321,9 @@ namespace SSIS.BLL.Services
 
             return user.DocumentsFilePath;
         }
+        #endregion
 
+        #region VerifyUserAsync
         public async Task<bool> VerifyUserAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -307,7 +348,9 @@ namespace SSIS.BLL.Services
             await _unitOfWork.SaveChangesAsync();
             return true;
         }
+        #endregion
 
+        #region RejectUserAsync
         public async Task<bool> RejectUserAsync(Guid id, string? rejectionReason = null)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -343,29 +386,13 @@ namespace SSIS.BLL.Services
             await _unitOfWork.SaveChangesAsync();
             return true;
         }
+        #endregion
 
-        private async Task<string> SaveFileAsync(IFormFile file, string folderName)
+
+        #region SendEmailVerificationCodeAsync
+        public async Task<(bool seccess, string message)> SendEmailVerificationCodeAsync(string email)
         {
-            string uploadsFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot", "uploads", folderName);
-
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            string uniqueFileName = $"{Guid.NewGuid()}_{file.FileName}";
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream); 
-            }
-
-            return Path.Combine("uploads", folderName, uniqueFileName).Replace("\\", "/");
-        }
-        public async Task<(bool seccess,string message )> SendEmailVerificationCodeAsync(string email)
-        {
-            var user=await _userRepository.GetByEmailAsync(email);
+            var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
                 return (false, "User not found");
 
@@ -373,20 +400,22 @@ namespace SSIS.BLL.Services
                 return (false, "Email already verified");
 
             var code = GenerateVerificationCode();
-                user.EmailVerificationAttempts = 0;
+            user.EmailVerificationAttempts = 0;
             user.EmailVerificationCode = code;
             user.EmailVerificationCodeExpiry = DateTime.UtcNow.AddMinutes(5);
             user.LastEmailVerificationAttempt = DateTime.UtcNow;
             await _userRepository.UpdateAsync(user);
             await _unitOfWork.SaveChangesAsync();
-            var body = $"<h1>Your code: {code}</h1><p>Valid for 15 min</p>";
+            var body = $"<h1>Your code: {code}</h1><p>Valid for 5 min</p>";
             await emailService.SendEmailASync(email, "Verification Code", body);
             return (true, "Code sent");
         }
+        #endregion
 
-       public async Task<(bool seccess,string message)> VerifyEmailCodeAsync(string email,string code)
+        #region VerifyEmailCodeAsync
+        public async Task<(bool seccess, string message)> VerifyEmailCodeAsync(string email, string code)
         {
-            var user =await _userRepository.GetByEmailAsync(email);
+            var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
                 return (false, "User not found");
 
@@ -396,7 +425,7 @@ namespace SSIS.BLL.Services
                 return (false, "Code expired");
             if (user.EmailVerificationAttempts >= MaxEmailCodeAttempts)
                 return (false, "Too many failed attempts");
-            if(user.EmailVerificationCode!=code)
+            if (user.EmailVerificationCode != code)
             {
                 user.EmailVerificationAttempts++;
                 await _userRepository.UpdateAsync(user);
@@ -421,7 +450,10 @@ namespace SSIS.BLL.Services
 
 
         }
-        public async Task<(bool seccess,string message)> ResendEmailVerificationCodeAsync(string email)
+        #endregion
+
+        #region ResendEmailVerificationCodeAsync
+        public async Task<(bool seccess, string message)> ResendEmailVerificationCodeAsync(string email)
         {
             var user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
@@ -435,9 +467,13 @@ namespace SSIS.BLL.Services
 
 
         }
+        #endregion
+
+        #region GenerateVerificationCode
         private string GenerateVerificationCode()
         {
             return new Random().Next(100000, 999999).ToString();
-        }
+        } 
+        #endregion
     }
 }

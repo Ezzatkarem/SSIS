@@ -16,6 +16,7 @@ namespace SSIS.BLL.Services.Implementation
             _context = context;
         }
 
+        #region CreateAsync
         public async Task<ScheduleDto?> CreateAsync(CreateScheduleDto dto)
         {
             // Verify course exists
@@ -43,7 +44,9 @@ namespace SSIS.BLL.Services.Implementation
 
             return MapToDto(schedule);
         }
+        #endregion
 
+        #region UpdateAsync
         public async Task<ScheduleDto?> UpdateAsync(Guid id, UpdateScheduleDto dto)
         {
             var schedule = await _context.Schedules.FindAsync(id);
@@ -64,7 +67,9 @@ namespace SSIS.BLL.Services.Implementation
 
             return MapToDto(schedule);
         }
+        #endregion
 
+        #region DeleteAsync
         public async Task<bool> DeleteAsync(Guid id)
         {
             var schedule = await _context.Schedules.FindAsync(id);
@@ -78,7 +83,9 @@ namespace SSIS.BLL.Services.Implementation
 
             return true;
         }
+        #endregion
 
+        #region GetByIdAsync
         public async Task<ScheduleDto?> GetByIdAsync(Guid id)
         {
             var schedule = await _context.Schedules
@@ -90,7 +97,9 @@ namespace SSIS.BLL.Services.Implementation
 
             return MapToDto(schedule);
         }
+        #endregion
 
+        #region GetByCourseAsync
         public async Task<IReadOnlyList<ScheduleDto>> GetByCourseAsync(Guid courseId)
         {
             var schedules = await _context.Schedules
@@ -100,7 +109,9 @@ namespace SSIS.BLL.Services.Implementation
 
             return schedules.Select(MapToDto).ToList();
         }
+        #endregion
 
+        #region GetAllAsync
         public async Task<IReadOnlyList<ScheduleDto>> GetAllAsync()
         {
             var schedules = await _context.Schedules
@@ -109,7 +120,8 @@ namespace SSIS.BLL.Services.Implementation
                 .ToListAsync();
 
             return schedules.Select(MapToDto).ToList();
-        }
+        } 
+        #endregion
 
         private ScheduleDto MapToDto(Schedule schedule)
         {
