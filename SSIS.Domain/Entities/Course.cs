@@ -21,5 +21,8 @@ namespace SSIS.Domain.Entities
         public User? Doctor { get; set; }
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();
+
+        // Grade navigation property
+        public ICollection<Grade> Grades { get; set; } = new List<Grade>();
     }
 }

@@ -351,6 +351,61 @@ namespace SSIS.DAL.Migrations
                     b.ToTable("Enrollments");
                 });
 
+            modelBuilder.Entity("SSIS.Domain.Entities.Grade", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AcademicYear")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("GradeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("GradeLetter")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Score")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Semester")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("StudentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Grades");
+                });
+
             modelBuilder.Entity("SSIS.Domain.Entities.Schedule", b =>
                 {
                     b.Property<Guid>("Id")
@@ -580,6 +635,25 @@ namespace SSIS.DAL.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("SSIS.Domain.Entities.Grade", b =>
+                {
+                    b.HasOne("SSIS.Domain.Entities.Course", "Course")
+                        .WithMany("Grades")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SSIS.Domain.Entities.User", "Student")
+                        .WithMany("Grades")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("SSIS.Domain.Entities.Schedule", b =>
                 {
                     b.HasOne("SSIS.Domain.Entities.Course", "Course")
@@ -595,12 +669,16 @@ namespace SSIS.DAL.Migrations
                 {
                     b.Navigation("Enrollments");
 
+                    b.Navigation("Grades");
+
                     b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("SSIS.Domain.Entities.User", b =>
                 {
                     b.Navigation("Enrollments");
+
+                    b.Navigation("Grades");
 
                     b.Navigation("TaughtCourses");
                 });

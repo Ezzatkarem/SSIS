@@ -44,5 +44,8 @@ namespace SSIS.Domain.Entities
         // Navigation properties for Phase 2
         public ICollection<Course> TaughtCourses { get; set; } = new List<Course>();
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+
+        // Grade navigation property
+        public ICollection<Grade> Grades { get; set; } = new List<Grade>();
     }
 }

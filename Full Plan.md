@@ -106,7 +106,7 @@
 ### 3.1 Domain Layer
 | Task | Description |
 |------|-------------|
-| T3.1 | Create `Grade.cs` (Id, StudentId, CourseId, Score, GradeLetter, Semester, AcademicYear, Remarks) |
+| T3.1 | Create `Grade.cs` (Id, StudentId, CourseId, Score, GradeLetter,    , AcademicYear, Remarks) |
 | T3.2 | Add GradeLetter Enum (A, B, C, D, F) |
 
 ### 3.2 DAL Layer

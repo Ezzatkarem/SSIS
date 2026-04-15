@@ -19,7 +19,8 @@ namespace SSIS.BLL.Extentions
             services.AddScoped<ICourseService, SSIS.BLL.Services.Implementation.CourseService>();
             services.AddScoped<IEnrollmentService, SSIS.BLL.Services.Implementation.EnrollmentService>();
             services.AddScoped<IScheduleService, SSIS.BLL.Services.Implementation.ScheduleService>();
-            
+            services .AddScoped<IGradeService, SSIS.BLL.Services.Implementaion.GradeService>();
+
             return services;
         }
     }

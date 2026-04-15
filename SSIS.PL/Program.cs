@@ -10,6 +10,7 @@ using SSIS.PL.Extensions;
 using System.Text;
 using SSIS.BLL.Extentions;
 using SSIS.BLL.Validators;
+using SSIS.BLL.Services.Implementaion;
 
 namespace SSIS.PL
 {
@@ -18,6 +19,7 @@ namespace SSIS.PL
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+           
 
             builder.Services.AddDALServices(builder.Configuration);
 
@@ -30,7 +32,7 @@ namespace SSIS.PL
             builder.Services.AddControllers();
             builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
             builder.Services.AddFluentValidationAutoValidation();
-
+            builder.Services.AddAutoMapper(cfg => { }, typeof(GradeService).Assembly);
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())

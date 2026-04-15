@@ -16,6 +16,8 @@ namespace SSIS.DAL.Data
         public DbSet<Course> Courses { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
         public DbSet<Schedule> Schedules { get; set; }
+        public DbSet<Grade> Grades { get; set; }
+        public IEnumerable<object> Grade { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
