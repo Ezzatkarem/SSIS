@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Progects .NET\\SSIS\\SSIS\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{80064E10-955B-6911-AC41-E5B223BA4530}|SSIS.BLL\\SSIS.BLL.csproj|d:\\progects .net\\ssis\\ssis\\ssis.bll\\mapper\\automapperprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{80064E10-955B-6911-AC41-E5B223BA4530}|SSIS.BLL\\SSIS.BLL.csproj|solutionrelative:ssis.bll\\mapper\\automapperprofile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{80064E10-955B-6911-AC41-E5B223BA4530}|SSIS.BLL\\SSIS.BLL.csproj|d:\\progects .net\\ssis\\ssis\\ssis.bll\\dtos\\fee\\createfeedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{80064E10-955B-6911-AC41-E5B223BA4530}|SSIS.BLL\\SSIS.BLL.csproj|solutionrelative:ssis.bll\\dtos\\fee\\createfeedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CreateFeeDto.cs",
+              "DocumentMoniker": "D:\\Progects .NET\\SSIS\\SSIS\\SSIS.BLL\\DTOs\\Fee\\CreateFeeDto.cs",
+              "RelativeDocumentMoniker": "SSIS.BLL\\DTOs\\Fee\\CreateFeeDto.cs",
+              "ToolTip": "D:\\Progects .NET\\SSIS\\SSIS\\SSIS.BLL\\DTOs\\Fee\\CreateFeeDto.cs",
+              "RelativeToolTip": "SSIS.BLL\\DTOs\\Fee\\CreateFeeDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T12:50:11.055Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AutoMapperProfile.cs",
+              "DocumentMoniker": "D:\\Progects .NET\\SSIS\\SSIS\\SSIS.BLL\\Mapper\\AutoMapperProfile.cs",
+              "RelativeDocumentMoniker": "SSIS.BLL\\Mapper\\AutoMapperProfile.cs",
+              "ToolTip": "D:\\Progects .NET\\SSIS\\SSIS\\SSIS.BLL\\Mapper\\AutoMapperProfile.cs",
+              "RelativeToolTip": "SSIS.BLL\\Mapper\\AutoMapperProfile.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAF0AAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T12:42:00.765Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
