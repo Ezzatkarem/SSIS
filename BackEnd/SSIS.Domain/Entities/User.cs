@@ -27,7 +27,6 @@ namespace SSIS.Domain.Entities
        // Doctor
         public string? Title { get; set; }                  
         public string? Specialization { get; set; }         
-        public int? YearsOfExperience { get; set; }         
         public string? UniversityDegreePath { get; set; }   
         public string? CvPath { get; set; }                
 

@@ -132,7 +132,6 @@ namespace SSIS.BLL.Services
                 SecondarySchoolCertificatePath = secondaryCertificatePath,
                 Title = request.Role == UserRole.Doctor ? request.Title : null,
                 Specialization = request.Role == UserRole.Doctor ? request.Specialization : null,
-                YearsOfExperience = request.Role == UserRole.Doctor ? request.YearsOfExperience : null,
                 UniversityDegreePath = universityDegreePath,
                 CvPath = cvPath,
                 AdminCodeUsed = request.Role == UserRole.Admin ? request.AdminCode : null,

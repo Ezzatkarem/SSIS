@@ -20,7 +20,7 @@ namespace SSIS.BLL.Services.Interfaces
         Task<Responce<IReadOnlyList<FeeResponceDto>>> GetMyFeesAsync(Guid studentId);
 
         /// Background Job
-        Task AutoGenerateFeesAsync (FeeSettingsDto dto);
+        Task <Responce<bool>>AutoGenerateFeesAsync (FeeSettingsDto dto);
 
 
     }

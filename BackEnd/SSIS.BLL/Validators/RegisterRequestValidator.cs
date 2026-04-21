@@ -40,9 +40,6 @@ namespace SSIS.BLL.Validators
                     .NotEmpty().WithMessage("Title is required");
                 RuleFor(x => x.Specialization)
                     .NotEmpty().WithMessage("Specialization is required");
-                RuleFor(x => x.YearsOfExperience)
-                    .NotNull().WithMessage("Years of experience is required")
-                    .InclusiveBetween(0, 50).WithMessage("Years of experience must be between 0 and 50");
                 RuleFor(x => x.UniversityDegree)
                     .NotNull().WithMessage("University degree certificate is required for doctors");
             });

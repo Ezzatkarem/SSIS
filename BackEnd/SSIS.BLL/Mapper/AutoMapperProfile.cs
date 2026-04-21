@@ -47,6 +47,11 @@ namespace SSIS.BLL.Mapper
             .ForMember(dest => dest.Payments, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+            .ForMember(dest => dest.academicYear, opt => opt.MapFrom(src => src.AcademicYear))
+            .ForMember(dest => dest.semester, opt => opt.MapFrom(src => src.Semester))
+                        .ForMember(dest => dest.StudentId, opt => opt.MapFrom(src => src.StudentId))
+
+
 
              .ForMember(dest => dest.feeStatus, opt => opt.MapFrom(src => FeeStaus.Unpaid))
              .ForMember(dest => dest.PaidAmount, opt => opt.MapFrom(src => 0m));

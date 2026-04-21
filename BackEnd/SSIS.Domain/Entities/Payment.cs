@@ -12,7 +12,7 @@ namespace SSIS.Domain.Entities
         public  Guid StudentId { get; set; }
         public decimal Amount { get; set; }
         public DateTime  PaymentDate { get; set; }
-        public string TransactionId { get; set; }
+        public string? TransactionId { get; set; }
         public string PaymentMethod { get; set; }=string.Empty;
         public PaymentStatus PaymentStatus { get; set; }
         public string? ReceipeUrl { get; set; }

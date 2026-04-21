@@ -25,7 +25,6 @@ namespace SSIS.BLL.DTOs.Login
         // Doctor
         public string? Title { get; set; }
         public string? Specialization { get; set; }
-        public int? YearsOfExperience { get; set; }
         public IFormFile? UniversityDegree { get; set; }
         public IFormFile? Cv { get; set; }
 

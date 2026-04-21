@@ -11,6 +11,7 @@ namespace SSIS.Domain.Interfaces
         
         Task<IReadOnlyList<Fee>> GetByStudentIdAsync(Guid studentId);
         Task<IReadOnlyList<Fee>> GetBySTatusAsync(FeeStaus staus);
+        Task<Fee?> GetByIdWithStudentAsync(Guid id);
         Task<IReadOnlyList<Fee>> GetOvardueFeesAsync(DateTime CurrentDate);
         Task<decimal> GetTotalFeesByStudentAsync(Guid studentId);
         Task<decimal> GetPaidFeesByStudentAsync(Guid studentId);

@@ -15,5 +15,7 @@ namespace SSIS.BLL.DTOs.Payment
         public PaymentStatus PaymentStatus {  get; set; }
         public string? TransactionId { get; set; }
         public string? ReceipId { get; set; }
+        public string? PaymentUrl { get; set; }   
+
     }
 }

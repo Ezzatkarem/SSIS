@@ -16,9 +16,16 @@ namespace SSIS.DAL.Repositories
         {
         }
 
+
         public async Task<IReadOnlyList<Fee>> GetBySTatusAsync(FeeStaus status)
         {
             return await _context.Fees.Where(p => p.feeStatus == status).Include(p => p.Student).Include(p => p.Payments).ToListAsync();
+        }
+        public async Task<Fee?> GetByIdWithStudentAsync(Guid id)
+        {
+            return await _context.Fees
+                .Include(f => f.Student)   
+                .FirstOrDefaultAsync(f => f.Id == id);
         }
 
         public async Task<IReadOnlyList<Fee>> GetByStudentIdAsync(Guid studentId)

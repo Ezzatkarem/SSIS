@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SSIS.BLL.DTOs.Payment
+public class PaymobCallBackDto
 {
-    public class PaymobCallBackDto
-    {
-        public string Hmac { get; set; }=string.Empty;
-        public PaymobCallBackData? Data { get; set; }
+    public string Type { get; set; }
+    public PaymobTransaction Obj { get; set; }
+}
 
-    }
-    public class PaymobCallBackData
-    {
-        public string? OrderId { get; set; }
-        public string? TransactionId { get; set; }
-        public string? Amount { get; set; }
-        public string? Success { get; set; }
-        public string? Pending { get; set; }
+public class PaymobTransaction
+{
+    public long Id { get; set; }
+    public bool Success { get; set; }
+    public long Amount_Cents { get; set; }
+    public string Currency { get; set; }
+    public PaymobOrder Order { get; set; }
+}
 
-    }
-
+public class PaymobOrder
+{
+    public long Id { get; set; }
 }

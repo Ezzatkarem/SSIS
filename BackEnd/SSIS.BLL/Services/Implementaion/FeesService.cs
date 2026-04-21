@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.VisualBasic;
 using SSIS.BLL.DTOs.Fee;
 using SSIS.BLL.Responce;
 using SSIS.BLL.Services.Interfaces;
@@ -61,7 +62,7 @@ namespace SSIS.BLL.Services.Implementaion
         public async Task<Responce<bool>> DeleteFeeAsync(Guid feeId)
         {
             var fee = await feeRepo.GetByIdAsync(feeId);
-            if (fee != null)
+            if (fee == null)
             {
                 return new Responce<bool>(false, false, "Fee Not Found");
 
@@ -126,23 +127,59 @@ namespace SSIS.BLL.Services.Implementaion
             var res = mapper.Map<IReadOnlyList<FeeResponceDto>>(fees);
             return new Responce<IReadOnlyList<FeeResponceDto>>(res, true, null!);
 
-        } 
+        }
         #endregion
 
 
-        public Task<Responce<FeeResponceDto>> UpdateFeeAsync(Guid feeId, UpdateFee dto)
+        #region UpdateFeeAsync
+        public async Task<Responce<FeeResponceDto>> UpdateFeeAsync(Guid feeId, UpdateFee dto)
         {
-            throw new NotImplementedException();
+            var fees = await feeRepo.GetByIdAsync(feeId);
+            if (fees == null)
+            {
+                return new Responce<FeeResponceDto>(null, false, "Fee Not found");
+            }
+            fees.TotalAmount = dto.TotalAmount;
+            fees.DueDate = dto.DueDate;
+            fees.UpdatedAt=DateTime.Now;
+            var res = mapper.Map<FeeResponceDto>(fees);
+            await feeRepo.UpdateAsync(fees);
+            await unitOfWork.SaveChangesAsync();
+            return new Responce<FeeResponceDto>(res, false, "Fee Not found");
+
+
         }
-        public Task AutoGenerateFeesAsync(FeeSettingsDto dto)
+        #endregion
+        #region AutoGenerateFeesAsync
+        public async Task<Responce<bool>> AutoGenerateFeesAsync(FeeSettingsDto dto)
         {
-            throw new NotImplementedException();
-        }
+            var students = await userRepo.GetAllAsync();
+            students = students.Where(p => p.Role == UserRole.Student).ToList();
+            foreach (var student in students)
+            {
+                var existingfees = await feeRepo.GetByStudentIdAsync(student.Id);
+                if (existingfees.Any(f => f.semester == dto.Semester && f.academicYear == dto.AcademicYear))
+                    continue;
+
+                var createFeeDto = new CreateFeeDto
+                {
+                    StudentId = student.Id,
+                    Semester = dto.Semester,
+                    AcademicYear = dto.AcademicYear,
+                    TotalAmount = dto.AmountPerStudent,  
+                    DueDate = dto.DueDate
+                }; await CreateFeeForStudentAsync(createFeeDto);
+
+            }
+                return new Responce<bool>(true, true, "auto generate fees has succesfully");
+
+        } 
+        #endregion
 
         #region GetFeeByIdAsync
         public async Task<Responce<FeeResponceDto>> GetFeeByIdAsync(Guid feeId)
         {
-            var fee = feeRepo.GetByIdAsync(feeId);
+            var fee =await feeRepo.GetByIdAsync(feeId);
             if (fee == null)
             {
                 return new Responce<FeeResponceDto>(null, false, "fee Not Found");
