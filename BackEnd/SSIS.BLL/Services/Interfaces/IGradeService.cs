@@ -15,6 +15,7 @@ namespace SSIS.BLL.Services.Interfaces
         Task<Responce<GpaResponce>> CalculateGpaAsync ( Guid studintId,int? semester=null,int? academicYear=null);
         Task<Responce<IReadOnlyList<GradeDTO>>> GetGradesByCourseAsync(Guid courseId);
         Task<Responce<bool>> deleteGradeAsync(Guid gradeId,Guid DoctorId);
+        Task<Responce<GradeDTO>> GetgradeBYIdAsync(Guid gradeid);
 
     }
 }

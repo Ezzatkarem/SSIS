@@ -21,7 +21,9 @@ namespace SSIS.DAL.Data
         public IEnumerable<object> Grade { get; internal set; }
         public DbSet<Payment> Payments  { get; set; }
         public DbSet<Fee> Fees { get; set; }
+        public DbSet<Attendance> Attendances { get; set; }
 
+        public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

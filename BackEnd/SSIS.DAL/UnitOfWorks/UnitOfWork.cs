@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore.Storage;
 using SSIS.DAL.Data;
 
@@ -21,6 +22,9 @@ namespace SSIS.DAL.UnitOfWork
         private IGradeRepository ? _gradeRepository;
         private IpaymentRepo? _paymentRepository;
         private IFeeRepo? feeRepo;
+        private INotficationRepo? notficationRepo;
+        private IAttendaceRepo? attendaceRepo;
+
         public UnitOfWork(AppDbContext context)
         {
             _context = context;
@@ -32,6 +36,8 @@ namespace SSIS.DAL.UnitOfWork
         public IGradeRepository Grades => _gradeRepository ??= new GradeRepository(_context);
         public IpaymentRepo Payments => _paymentRepository ??= new PaymentRepo(_context);
         public IFeeRepo Fees => feeRepo ??= new FeeRepo(_context);
+        public INotficationRepo notfications => notficationRepo ??= new NotficationRepo(_context);
+        public IAttendaceRepo attendace => attendaceRepo ??= new AttendanceRepo(_context);
 
         IRepository<Grade> IUnitOfWork.Grades => Grades;
 

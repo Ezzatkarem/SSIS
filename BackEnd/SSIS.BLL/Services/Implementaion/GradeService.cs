@@ -229,7 +229,12 @@ namespace SSIS.BLL.Services.Implementaion
 
         #endregion
 
-
+        public async Task<Responce<GradeDTO>> GetgradeBYIdAsync (Guid gradeid)
+        {
+            var grade= await _unitOfWork.Grades.GetByIdAsync(gradeid);
+            var res=mapper.Map<GradeDTO>(grade);
+            return new Responce<GradeDTO>(res, true, null!); 
+        }
 
     }
 }

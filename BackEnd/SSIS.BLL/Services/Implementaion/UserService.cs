@@ -131,6 +131,7 @@ namespace SSIS.BLL.Services
                 NationalIdImagePath = nationalIdPath,
                 SecondarySchoolCertificatePath = secondaryCertificatePath,
                 Title = request.Role == UserRole.Doctor ? request.Title : null,
+                Level = 1,
                 Specialization = request.Role == UserRole.Doctor ? request.Specialization : null,
                 UniversityDegreePath = universityDegreePath,
                 CvPath = cvPath,

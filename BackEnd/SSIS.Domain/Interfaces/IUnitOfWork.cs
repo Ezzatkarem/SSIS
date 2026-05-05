@@ -15,6 +15,8 @@ namespace SSIS.Domain.Interfaces
         // IRepository<Attendance> Attendances { get; }
          IFeeRepo Fees { get; }
         IpaymentRepo Payments { get; }
+        INotficationRepo notfications { get; }
+        IAttendaceRepo attendace { get; }
 
         // Save
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

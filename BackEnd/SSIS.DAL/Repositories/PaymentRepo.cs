@@ -14,6 +14,7 @@ namespace SSIS.DAL.Repositories
         public PaymentRepo(AppDbContext context) : base(context)
         {
         }
+        
 
         public async Task<IReadOnlyList<Payment>> GetByFeeIdAsync(Guid FeeId)
         {

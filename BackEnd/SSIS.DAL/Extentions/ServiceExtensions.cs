@@ -34,7 +34,9 @@ namespace SSIS.DAL.Extensions
             services.AddScoped<IGradeRepository, GradeRepository>();
             services.AddScoped<IUnitOfWork, SSIS.DAL.UnitOfWork.UnitOfWork>();
             services.AddScoped<IpaymentRepo, PaymentRepo>();
-            services.AddScoped<IFeeRepo, FeeRepo>  ();
+            services.AddScoped<IFeeRepo, FeeRepo>();
+            services.AddScoped<INotficationRepo, NotficationRepo>();
+            services.AddScoped<IAttendaceRepo, AttendanceRepo>();
 
             return services;
         }
