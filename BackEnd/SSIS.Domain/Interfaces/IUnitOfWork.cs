@@ -17,6 +17,7 @@ namespace SSIS.Domain.Interfaces
         IpaymentRepo Payments { get; }
         INotficationRepo notfications { get; }
         IAttendaceRepo attendace { get; }
+        IAuditLogRepository AuditLogs { get; }
 
         // Save
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

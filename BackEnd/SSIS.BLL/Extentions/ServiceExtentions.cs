@@ -24,6 +24,8 @@ namespace SSIS.BLL.Extentions
             services.AddScoped<IPaymentService, SSIS.BLL.Services.Implementaion.PaymentService>();
             services.AddScoped<IAttendanceService, SSIS.BLL.Services.Implementaion.AttendanceService>();
             services.AddScoped<INotificationService, SSIS.BLL.Services.Implementaion.NotificationService>();
+            services.AddScoped<IReportService, SSIS.BLL.Services.Implementation.ReportService>();
+            services.AddScoped<IAuditLogService, SSIS.BLL.Services.Implementation.AuditLogService>();
 
             return services;
         }

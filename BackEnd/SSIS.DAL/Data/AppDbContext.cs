@@ -23,6 +23,7 @@ namespace SSIS.DAL.Data
         public DbSet<Fee> Fees { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
 
+        public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {

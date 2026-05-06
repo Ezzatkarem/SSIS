@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using AutoMapper;
+using SSIS.BLL.DTOs.Admin;
 using SSIS.BLL.DTOs.Attendances;
 using SSIS.BLL.DTOs.Fee;
 using SSIS.BLL.DTOs.Grades;
@@ -114,6 +115,10 @@ namespace SSIS.BLL.Mapper
             CreateMap<Attendance, AttendanceDto>()
       .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.course.Name))
       .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.FullName));
+
+            // Audit Log mappings
+            CreateMap<AuditLog, AuditLogDto>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User != null ? src.User.FullName : "System"));
       
 
 
