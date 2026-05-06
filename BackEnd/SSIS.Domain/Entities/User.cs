@@ -57,5 +57,7 @@ namespace SSIS.Domain.Entities
 
 
         public ICollection<Notification>? Notefications { get; set; } = new List<Notification>();
+
+        public ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
     }
 }

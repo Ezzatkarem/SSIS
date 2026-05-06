@@ -25,6 +25,7 @@ namespace SSIS.DAL.Data
         public DbSet<Attendance> Attendances { get; set; }
         public DbSet<CoursePrerequesite> coursePrerequesites { get; set; }
 
+        public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {

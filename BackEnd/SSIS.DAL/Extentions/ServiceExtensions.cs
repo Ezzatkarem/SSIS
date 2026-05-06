@@ -38,7 +38,7 @@ namespace SSIS.DAL.Extensions
             services.AddScoped<INotficationRepo, NotficationRepo>();
             services.AddScoped<IAttendaceRepo, AttendanceRepo>();
             services.AddScoped<ICoursePrerequisiteRepository, CoursePrerequisiteRepository>();
-            services.AddScoped<IReportRepository, ReportReposatory>();
+            services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
             return services;
         }
