@@ -22,13 +22,15 @@ namespace SSIS.Domain.Entities
         public string NationalIdImagePath { get; set; }    
         public bool IsVerified { get; set; } = false;       
         public string? SecondarySchoolCertificatePath { get; set; }  
+        public int? Level { get; set; }
          
 
        // Doctor
         public string? Title { get; set; }                  
         public string? Specialization { get; set; }         
         public string? UniversityDegreePath { get; set; }   
-        public string? CvPath { get; set; }                
+        public string? CvPath { get; set; }             
+        
 
         // Admin
         public string? AdminCodeUsed { get; set; }    
@@ -50,5 +52,8 @@ namespace SSIS.Domain.Entities
         // Payment Navigation Property
         public ICollection<Fee>? Fees { get; set; }= new List<Fee>();
         public ICollection<Payment>? Payments { get; set; }=new List<Payment>();
+
+
+        public ICollection<Notification>? Notefications { get; set; } = new List<Notification>();
     }
 }

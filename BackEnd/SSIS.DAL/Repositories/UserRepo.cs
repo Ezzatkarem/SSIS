@@ -3,6 +3,7 @@ using SSIS.Domain.Entities;
 using SSIS.Domain.Interfaces;
 using SSIS.DAL.Data;
 using SSIS.DAL.Repositories;
+using SSIS.Domain.Enum;
 
 namespace SSIS.DAL.Repositories
 {
@@ -56,6 +57,11 @@ namespace SSIS.DAL.Repositories
                 user.IsActive = false;
                 await UpdateAsync(user);
             }
+        }
+
+        public async Task<List<User?>> GetByRoleAsync(UserRole role)
+        {
+            return await _context.Users.Where(p => p.Role == role).ToListAsync();
         }
     }
 }

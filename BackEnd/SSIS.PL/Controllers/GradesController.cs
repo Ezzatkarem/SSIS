@@ -11,10 +11,13 @@ namespace SSIS.PL.Controllers
     public class GradesController : ControllerBase
     {
         private readonly IGradeService _gradeService;
-
-        public GradesController(IGradeService gradeService)
+        private readonly INotificationService notificationService;
+        private readonly ICourseService courseService ;
+        public GradesController(IGradeService gradeService, INotificationService notificationService, ICourseService courseService)
         {
             _gradeService = gradeService;
+            this.notificationService = notificationService;
+            this.courseService = courseService;
         }
 
         [HttpPost]
@@ -27,6 +30,7 @@ namespace SSIS.PL.Controllers
             }
             var doctorId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value!);
             var res = await _gradeService.EnterGradeAsync(gradeDTO, doctorId);
+            await notificationService.NotifyGradeEnteredAsync(gradeDTO.StudentId, gradeDTO.CourseName, gradeDTO.Score);
             return Ok(res);
         }
         [HttpPut]
@@ -38,7 +42,10 @@ namespace SSIS.PL.Controllers
                 return BadRequest(ModelState);
             }
             var doctorId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value!);
+            var oldgrade=await _gradeService.GetgradeBYIdAsync(gradeId);
             var res = await _gradeService.UpdateGradesAsync(doctorId, gradeDTO, gradeId);
+            await notificationService.NotifyGradeUpdatedAsync(oldgrade.Data.StudentId, oldgrade.Data.CourseName,oldgrade.Data.Score, gradeDTO.Score);
+
             return Ok(res);
         }
         [HttpGet("student/{studentId}")]

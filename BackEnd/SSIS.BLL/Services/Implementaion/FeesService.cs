@@ -18,15 +18,17 @@ namespace SSIS.BLL.Services.Implementaion
         private readonly IUserRepo userRepo;
         private readonly IMapper mapper;
         private readonly IUnitOfWork unitOfWork;
+        private readonly INotificationService notificationService;
 
-       
 
-        public FeesService(IFeeRepo feeRepo, IUserRepo userRepo, IMapper mapper,IUnitOfWork unitOfWork)
+
+        public FeesService(IFeeRepo feeRepo, IUserRepo userRepo, IMapper mapper, IUnitOfWork unitOfWork, INotificationService notificationService)
         {
             this.feeRepo = feeRepo;
             this.userRepo = userRepo;
             this.mapper = mapper;
             this.unitOfWork = unitOfWork;
+            this.notificationService = notificationService;
         }
 
 
@@ -51,6 +53,7 @@ namespace SSIS.BLL.Services.Implementaion
             await feeRepo.AddAsync(fee);
             await unitOfWork.SaveChangesAsync();
             var res = mapper.Map<FeeResponceDto>(fee);
+           await notificationService.NotifyFeeCreatedAsync(fee.StudentId,fee.TotalAmount,fee.semester,fee.academicYear);
             return new Responce<FeeResponceDto>(res, true, "Create Fee Has Successfully");
 
 

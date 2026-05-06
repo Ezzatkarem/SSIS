@@ -14,11 +14,13 @@ namespace SSIS.PL.Controllers
     {
         private readonly IUserService _userService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly INotificationService notificationService ;
 
-        public AuthController(IUserService userService, IWebHostEnvironment webHostEnvironment)
+        public AuthController(IUserService userService, IWebHostEnvironment webHostEnvironment, INotificationService notificationService)
         {
             _userService = userService;
             _webHostEnvironment = webHostEnvironment;
+            this.notificationService = notificationService;
         }
         #region Register
         [HttpPost("register")]
@@ -31,7 +33,8 @@ namespace SSIS.PL.Controllers
 
             if (errors.Length > 0)
                 return BadRequest(new { errors });
-
+            await notificationService.NotifyWellcomeAsync(data.Id, request.FullName, data.Role.ToString());
+            await notificationService.NotifyUserRegisterAsync(data.Id, request.FullName, data.Role.ToString());
             return Ok(data);
         }
         #endregion

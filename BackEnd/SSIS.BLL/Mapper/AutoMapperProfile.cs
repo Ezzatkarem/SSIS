@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using SSIS.BLL.DTOs.Attendances;
 using SSIS.BLL.DTOs.Fee;
 using SSIS.BLL.DTOs.Grades;
 using SSIS.BLL.DTOs.Login;
+using SSIS.BLL.DTOs.Notification;
 using SSIS.BLL.DTOs.Payment;
 using SSIS.Domain.Entities;
 using SSIS.Domain.Enum;
@@ -107,8 +109,12 @@ namespace SSIS.BLL.Mapper
                   .ForMember(dest => dest.Student, opt => opt.Ignore());
 
             CreateMap<Payment, PaymentResponceDto>();
+            CreateMap<Notification, NotificationDto>();
 
-
+            CreateMap<Attendance, AttendanceDto>()
+      .ForMember(dest => dest.CourseName, opt => opt.MapFrom(src => src.course.Name))
+      .ForMember(dest => dest.StudentName, opt => opt.MapFrom(src => src.Student.FullName));
+      
 
 
 

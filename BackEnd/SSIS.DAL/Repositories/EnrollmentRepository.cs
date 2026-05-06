@@ -53,5 +53,11 @@ namespace SSIS.DAL.Repositories
             return await _context.Enrollments
                 .FirstOrDefaultAsync(e => e.StudentId == studentId && e.CourseId == courseId);
         }
+        public async Task<IReadOnlyList<Enrollment>> GetByCourseIdsAsync(List<Guid> courseIds)
+        {
+            return await _context.Enrollments
+                .Where(e => courseIds.Contains(e.CourseId))
+                .ToListAsync();
+        }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using SSIS.PLL.Services.Interfaces;
 using SSIS.BLL.DTOs.Users;
 using SSIS.BLL.Interfaces;
 using SSIS.BLL.Services.Interfaces; 
+using SSIS.PLL.Services.Interfaces;
 
 namespace SSIS.PL.Controllers.v1    
 {
@@ -13,10 +12,12 @@ namespace SSIS.PL.Controllers.v1
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly INotificationService notificationService ;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, INotificationService notificationService)
         {
             _userService = userService;
+            this.notificationService = notificationService;
         }
 
         #region GetAll
@@ -56,6 +57,8 @@ namespace SSIS.PL.Controllers.v1
             {
                 return NotFound(new { message = $"User with ID {id} not found" });
             }
+            await notificationService.NotifyProfileUpdateAsync(id,"njk");
+
             return Ok(user);
         }
         #endregion
@@ -70,6 +73,8 @@ namespace SSIS.PL.Controllers.v1
             {
                 return NotFound(new { message = $"User with ID {id} not found" });
             }
+            await notificationService.NotifyUserDeleteAsync(id, "njk");
+
             return Ok(new { message = "User deleted successfully" });
         }
         #endregion

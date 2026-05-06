@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSIS.DAL.Data;
 
@@ -11,9 +12,11 @@ using SSIS.DAL.Data;
 namespace SSIS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260422102348_notification")]
+    partial class notification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,39 +256,6 @@ namespace SSIS.DAL.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("SSIS.Domain.Entities.Attendance", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("AttendanceState")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("courseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentId");
-
-                    b.HasIndex("courseId");
-
-                    b.ToTable("Attendances");
-                });
-
             modelBuilder.Entity("SSIS.Domain.Entities.Course", b =>
                 {
                     b.Property<Guid>("Id")
@@ -479,7 +449,7 @@ namespace SSIS.DAL.Migrations
                     b.ToTable("Grades");
                 });
 
-            modelBuilder.Entity("SSIS.Domain.Entities.Notification", b =>
+            modelBuilder.Entity("SSIS.Domain.Entities.Notefication", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -524,7 +494,7 @@ namespace SSIS.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notefication");
                 });
 
             modelBuilder.Entity("SSIS.Domain.Entities.Payment", b =>
@@ -685,9 +655,6 @@ namespace SSIS.DAL.Migrations
                     b.Property<DateTime?>("LastEmailVerificationAttempt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("Level")
-                        .HasColumnType("int");
-
                     b.Property<string>("NationalIdImagePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -782,25 +749,6 @@ namespace SSIS.DAL.Migrations
                     b.Navigation("DomainUser");
                 });
 
-            modelBuilder.Entity("SSIS.Domain.Entities.Attendance", b =>
-                {
-                    b.HasOne("SSIS.Domain.Entities.User", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SSIS.Domain.Entities.Course", "course")
-                        .WithMany()
-                        .HasForeignKey("courseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-
-                    b.Navigation("course");
-                });
-
             modelBuilder.Entity("SSIS.Domain.Entities.Course", b =>
                 {
                     b.HasOne("SSIS.Domain.Entities.User", "Doctor")
@@ -859,7 +807,7 @@ namespace SSIS.DAL.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("SSIS.Domain.Entities.Notification", b =>
+            modelBuilder.Entity("SSIS.Domain.Entities.Notefication", b =>
                 {
                     b.HasOne("SSIS.Domain.Entities.User", "User")
                         .WithMany("Notefications")

@@ -20,18 +20,20 @@ namespace SSIS.BLL.Services.Implementaion
             private readonly IFeeRepo _feeRepo;
             private readonly IUnitOfWork _unitOfWork;
             private readonly IMapper _mapper;
+        private readonly INotificationService notificationService;
 
-            public PaymentService(HttpClient httpClient, IConfiguration config, IpaymentRepo paymentRepo, IFeeRepo feeRepo, IUnitOfWork unitOfWork, IMapper mapper)
-            {
-                _httpClient = httpClient;
-                _config = config;
-                _paymentRepo = paymentRepo;
-                _feeRepo = feeRepo;
-                _unitOfWork = unitOfWork;
-                _mapper = mapper;
-            }
+        public PaymentService(HttpClient httpClient, IConfiguration config, IpaymentRepo paymentRepo, IFeeRepo feeRepo, IUnitOfWork unitOfWork, IMapper mapper, INotificationService notificationService)
+        {
+            _httpClient = httpClient;
+            _config = config;
+            _paymentRepo = paymentRepo;
+            _feeRepo = feeRepo;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            this.notificationService = notificationService;
+        }
 
-            private static string? _cachedToken;
+        private static string? _cachedToken;
             private static DateTime _tokenExpiry = DateTime.MinValue;
 
             private async Task<string> GetAuthTokenAsync()
@@ -83,7 +85,6 @@ namespace SSIS.BLL.Services.Implementaion
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    // 🔴 سجل الخطأ من Paymob
                     throw new Exception($"Paymob error: {response.StatusCode} - {responseBody}");
                 }
 
@@ -173,22 +174,20 @@ namespace SSIS.BLL.Services.Implementaion
 
             public async Task<Responce<bool>> HandelPaymobCallbackAsync(PaymobCallBackDto dto)
             {
-                // سجل البيانات عشان التتبع
-                Console.WriteLine($"Paymob Callback received. Type: {dto?.Type}, Success: {dto?.Obj?.Success}, OrderId: {dto?.Obj?.Order?.Id}, TransactionId: {dto?.Obj?.Id}");
 
-                if (dto?.Obj == null || dto.Obj.Success != true)
-                {
-                    return new Responce<bool>(false, false, $"Transaction not successful or data missing. Success: {dto?.Obj?.Success}");
-                }
-
-                // جيب الـ payment باستخدام order id
                 var orderId = dto.Obj.Order.Id.ToString();
                 var payment = await _paymentRepo.GetByPaymobOrderIdAsync(orderId);
                 
+                if (dto?.Obj == null || dto.Obj.Success != true)
+                {
+                await notificationService.NotifyPaymentFaildAsync(payment.StudentId, payment.Amount,payment.Fee.semester, "Payment failed at gateway");
+                return new Responce<bool>(false, false, $"Transaction not successful or data missing. Success: {dto?.Obj?.Success}");
+                }
+
                 if (payment == null)
                 {
-                    Console.WriteLine($"Payment record not found for OrderId: {orderId}");
-                    return new Responce<bool>(false, false, "Payment not found in our records");
+                await notificationService.NotifyPaymentFaildAsync(payment.StudentId, payment.Amount, payment.Fee.semester, "Payment failed at gateway");
+                return new Responce<bool>(false, false, "Payment not found in our records");
                 }
 
                 if (payment.PaymentStatus == PaymentStatus.Completed)
@@ -196,7 +195,6 @@ namespace SSIS.BLL.Services.Implementaion
                     return new Responce<bool>(true, true, "Payment already processed");
                 }
 
-                // ✅ هنا بنحط الـ transactionId وتحديث الحالة
                 payment.PaymentStatus = PaymentStatus.Completed;
                 payment.TransactionId = dto.Obj.Id.ToString();
                 payment.PaymentDate = DateTime.UtcNow;
@@ -204,7 +202,6 @@ namespace SSIS.BLL.Services.Implementaion
                 await _paymentRepo.UpdateAsync(payment);
                 await _unitOfWork.SaveChangesAsync();
 
-                // تحديث الفاتورة
                 var fee = await _feeRepo.GetByIdAsync(payment.FeeId);
                 if (fee != null)
                 {
@@ -218,6 +215,7 @@ namespace SSIS.BLL.Services.Implementaion
                     await _feeRepo.UpdateAsync(fee);
                     await _unitOfWork.SaveChangesAsync();
                 }
+            await notificationService.NotifyPaymentSeccessAsync(payment.StudentId, payment.Amount, payment.TransactionId);
 
                 return new Responce<bool>(true, true, "Callback processed successfully");
             }

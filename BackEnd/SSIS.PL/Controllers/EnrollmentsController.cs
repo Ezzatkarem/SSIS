@@ -11,10 +11,12 @@ namespace SSIS.PL.Controllers
     public class EnrollmentsController : ControllerBase
     {
         private readonly IEnrollmentService _enrollmentService;
+        private readonly INotificationService notificationService ;
 
-        public EnrollmentsController(IEnrollmentService enrollmentService)
+        public EnrollmentsController(IEnrollmentService enrollmentService, INotificationService notificationService)
         {
             _enrollmentService = enrollmentService;
+            this.notificationService = notificationService;
         }
 
         #region Enroll
@@ -29,6 +31,7 @@ namespace SSIS.PL.Controllers
             if (enrollment == null)
                 return BadRequest(new { message = "Failed to enroll student" });
 
+            await notificationService.NotifyEnrollmentCreatedAsync(enrollment.StudentId, enrollment.CourseName);
             return CreatedAtAction(nameof(GetById), new { id = enrollment.Id }, enrollment);
         }
         #endregion
@@ -36,12 +39,15 @@ namespace SSIS.PL.Controllers
         #region Unenroll
         [HttpDelete("{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Unenroll(Guid id)
+        public async Task<IActionResult> Unenroll(Guid  id)
         {
+            var enrollment = await _enrollmentService.GetByIdAsync(id);
+
             var result = await _enrollmentService.UnenrollAsync(id);
             if (!result)
                 return NotFound(new { message = "Enrollment not found" });
 
+            await notificationService.NotifyEnrollmentRemovedAsync(enrollment.StudentId, enrollment.CourseName);
             return NoContent();
         }
         #endregion

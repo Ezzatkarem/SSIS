@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SSIS.BLL.DTOs;
 using SSIS.BLL.DTOs.Courses;
 using SSIS.BLL.Services.Interfaces;
+using SSIS.Domain.Entities;
 
 namespace SSIS.PL.Controllers
 {
@@ -12,10 +13,12 @@ namespace SSIS.PL.Controllers
     public class CoursesController : ControllerBase
     {
         private readonly ICourseService _courseService;
+        private readonly INotificationService notificationService ;
 
-        public CoursesController(ICourseService courseService)
+        public CoursesController(ICourseService courseService, INotificationService notificationService)
         {
             _courseService = courseService;
+            this.notificationService = notificationService;
         }
 
         #region GetAll
@@ -60,6 +63,7 @@ namespace SSIS.PL.Controllers
             if (course == null)
                 return BadRequest(new { message = "Course code already exists" });
 
+            await notificationService.NotifyCourseCreatedAsync(course.Name, course.Code);
             return CreatedAtAction(nameof(GetById), new { id = course.Id }, course);
         }
         #endregion
@@ -75,6 +79,7 @@ namespace SSIS.PL.Controllers
             var course = await _courseService.UpdateAsync(id, dto);
             if (course == null)
                 return NotFound(new { message = "Course not found" });
+            await notificationService.NotifyCourseUpdatedAsync(course.Name, course.Code);
 
             return Ok(course);
         }
@@ -85,9 +90,12 @@ namespace SSIS.PL.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid id)
         {
+            var course=await _courseService.GetByIdAsync(id);
             var result = await _courseService.DeleteAsync(id);
             if (!result)
                 return BadRequest(new { message = "Cannot delete course with active enrollments" });
+
+            await notificationService.NotifyCourseDeletedAsync(course!.Name, course.Code);
 
             return NoContent();
         }

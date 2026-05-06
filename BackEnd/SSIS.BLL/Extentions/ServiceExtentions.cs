@@ -22,6 +22,8 @@ namespace SSIS.BLL.Extentions
             services.AddScoped<IGradeService, SSIS.BLL.Services.Implementaion.GradeService>();
             services.AddScoped<IFeeService, SSIS.BLL.Services.Implementaion.FeesService>();
             services.AddScoped<IPaymentService, SSIS.BLL.Services.Implementaion.PaymentService>();
+            services.AddScoped<IAttendanceService, SSIS.BLL.Services.Implementaion.AttendanceService>();
+            services.AddScoped<INotificationService, SSIS.BLL.Services.Implementaion.NotificationService>();
 
             return services;
         }

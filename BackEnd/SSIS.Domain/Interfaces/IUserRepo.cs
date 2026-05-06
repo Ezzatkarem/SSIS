@@ -7,6 +7,7 @@ namespace SSIS.Domain.Interfaces
     public interface IUserRepo : IRepository<User>
     {
         Task<User?> GetByEmailAsync(string email);
+        Task<List<User?>> GetByRoleAsync(UserRole role);
         Task<User?> GetByIdentityUserIdAsync(string identityUserId);
         Task SoftDeleteAsync(Guid id);
         Task ActivateAsync(Guid id);
