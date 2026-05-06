@@ -1,8 +1,9 @@
+using SSIS.BLL.DTOs.Courses;
+using SSIS.BLL.Services.Interfaces;
+using SSIS.DAL.Repositories;
 using SSIS.Domain.Entities;
 using SSIS.Domain.Enum;
 using SSIS.Domain.Interfaces;
-using SSIS.BLL.DTOs.Courses;
-using SSIS.BLL.Services.Interfaces;
 
 namespace SSIS.BLL.Services.Implementation
 {
@@ -10,11 +11,15 @@ namespace SSIS.BLL.Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserRepo _userRepository;
+        private readonly ICoursePrerequisiteRepository coursePrerequisiteRepository;
+        private readonly IGradeRepository gradeRepository ;
 
-        public CourseService(IUnitOfWork unitOfWork, IUserRepo userRepository)
+        public CourseService(IUnitOfWork unitOfWork, IUserRepo userRepository, ICoursePrerequisiteRepository coursePrerequisiteRepository, IGradeRepository gradeRepository)
         {
             _unitOfWork = unitOfWork;
             _userRepository = userRepository;
+            this.coursePrerequisiteRepository = coursePrerequisiteRepository;
+            this.gradeRepository = gradeRepository;
         }
 
         #region CreateAsync
@@ -44,6 +49,135 @@ namespace SSIS.BLL.Services.Implementation
         }
 
         #endregion
+
+
+        #region CreateWithPrereqAsync
+        public async Task<CourseDto?> CreateWithPrereqAsync(CreateCourseWithPrereqDto dto)
+        {
+            if (await _unitOfWork.Courses.CodeExistsAsync(dto.Code))
+                return null;
+
+            var course = new Course
+            {
+                Id = Guid.NewGuid(),
+                Name = dto.Name,
+                Code = dto.Code,
+                Credits = dto.Credits,
+                Description = dto.Descreption,
+                Semester = dto.semester,
+                AcademicYear = dto.AcedemicYear,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            if (dto.DoctorID.HasValue)
+            {
+                var doctor = await _userRepository.GetByIdAsync(dto.DoctorID.Value);
+                if (doctor != null && doctor.Role == UserRole.Doctor)
+                    course.DoctorId = dto.DoctorID;
+            }
+
+            await _unitOfWork.Courses.AddAsync(course);
+            await _unitOfWork.SaveChangesAsync();
+
+            foreach (var prereqId in dto.PrerequistisIds)
+            {
+                var prereqCourse = await _unitOfWork.Courses.GetByIdAsync(prereqId);
+                if (prereqCourse == null || prereqCourse.IsDeleted)
+                    continue;
+
+                var prereq = new CoursePrerequesite
+                {
+                    Id = Guid.NewGuid(),
+                    Courseid = course.Id,
+                    PrerequesiteCourseid = prereqId,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _unitOfWork.coursePrerequisite.AddAsync(prereq);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            return MapToDto(course);
+        }
+        #endregion
+
+        #region GetAvailableCoursesForStudentAsync
+        public async Task<List<CourseDto>> GetAvailableCoursesForStudentAsync(Guid studentId)
+        {
+            var passedCourses = await gradeRepository.GetPassedCourseIdsByStudentAsync(studentId, 60);
+            var enrolledCourses = await _unitOfWork.Enrollments.GetCourseIdsByStudentAsync(studentId);
+            var allCourses = await _unitOfWork.Courses.GetAllAsync();
+            allCourses = allCourses.Where(c => !c.IsDeleted).ToList();
+
+            var availableCourses = new List<CourseDto>();
+
+            foreach (var course in allCourses)
+            {
+                if (enrolledCourses.Contains(course.Id) || passedCourses.Contains(course.Id))
+                    continue;
+
+                var prerequisites = await _unitOfWork.coursePrerequisite
+                    .GetPrerequisiteIdsByCourseAsync(course.Id);
+
+                if (!prerequisites.Any())
+                {
+                    availableCourses.Add(MapToDto(course));
+                    continue;
+                }
+
+                var hasAllPrerequisites = prerequisites.All(p => passedCourses.Contains(p));
+                if (hasAllPrerequisites)
+                {
+                    availableCourses.Add(MapToDto(course));
+                }
+            }
+
+            return availableCourses;
+        }
+        #endregion
+
+        #region SelfEnrollAsync
+        public async Task<(bool Success, string Message)> SelfEnrollAsync(Guid studentId, Guid courseId)
+        {
+            var course = await _unitOfWork.Courses.GetByIdAsync(courseId);
+            if (course == null || course.IsDeleted)
+                return (false, "Course not found");
+
+            var isEnrolled = await _unitOfWork.Enrollments.ExistsAsync(studentId, courseId);
+            if (isEnrolled)
+                return (false, "Already enrolled in this course");
+
+            var passedCourses = await gradeRepository.GetPassedCourseIdsByStudentAsync(studentId, 60);
+            var prerequisites = await _unitOfWork.coursePrerequisite.GetPrerequisiteIdsByCourseAsync(courseId);
+
+            if (prerequisites.Any())
+            {
+                var missingPrereqs = prerequisites.Where(p => !passedCourses.Contains(p)).ToList();
+                if (missingPrereqs.Any())
+                {
+                    var missingNames = await _unitOfWork.coursePrerequisite.GetNamesByIdsAsync(missingPrereqs);
+                    return (false, $"Missing prerequisites: {string.Join(", ", missingNames)}");
+                }
+            }
+
+            var enrollment = new Enrollment
+            {
+                Id = Guid.NewGuid(),
+                StudentId = studentId,
+                CourseId = courseId,
+                EnrollmentDate = DateTime.UtcNow,
+                IsActive = true,
+                Semester = course.Semester,
+                AcademicYear = course.AcademicYear,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _unitOfWork.Enrollments.AddAsync(enrollment);
+            await _unitOfWork.SaveChangesAsync();
+
+            return (true, $"Successfully enrolled in {course.Name}");
+        }
+        #endregion
         #region UpdateAsync
         public async Task<CourseDto?> UpdateAsync(Guid id, UpdateCourseDto dto)
         {
@@ -63,7 +197,7 @@ namespace SSIS.BLL.Services.Implementation
             return MapToDto(course);
         }
         #endregion
-
+            
         #region DeleteAsync
         public async Task<bool> DeleteAsync(Guid id)
         {

@@ -13,11 +13,14 @@ namespace SSIS.Domain.Entities
         public int Credits { get; set; }
         public string? Description { get; set; }
         public Guid? DoctorId { get; set; }
-        public string Semester { get; set; } = string.Empty;
-        public string AcademicYear { get; set; } = string.Empty;
+        public int Semester { get; set; }
+        public int AcademicYear { get; set; }
         public bool IsActive { get; set; } = true;
 
         // Navigation properties
+
+        public virtual ICollection<CoursePrerequesite> Prerequesites { get; set; } = new List<CoursePrerequesite>();
+        public virtual ICollection<CoursePrerequesite> RequiredFor { get; set; } = new List<CoursePrerequesite>();
         public User? Doctor { get; set; }
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public ICollection<Schedule> Schedules { get; set; } = new List<Schedule>();

@@ -11,6 +11,8 @@ namespace SSIS.BLL.Services.Interfaces
         Task<IReadOnlyList<CourseDto>> GetAllAsync();
         Task<IReadOnlyList<CourseDto>> GetByDoctorAsync(Guid doctorId);
         Task<bool> AssignDoctorAsync(Guid courseId, Guid doctorId);
-        Task<IReadOnlyList<CourseDto>> GetActiveCoursesAsync();
+        Task<CourseDto?> CreateWithPrereqAsync(CreateCourseWithPrereqDto dto);
+        Task<List<CourseDto>> GetAvailableCoursesForStudentAsync(Guid studentId);
+        Task<(bool Success, string Message)> SelfEnrollAsync(Guid studentId, Guid courseId);
     }
 }

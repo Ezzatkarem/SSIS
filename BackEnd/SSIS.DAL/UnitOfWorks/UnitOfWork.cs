@@ -24,6 +24,7 @@ namespace SSIS.DAL.UnitOfWork
         private IFeeRepo? feeRepo;
         private INotficationRepo? notficationRepo;
         private IAttendaceRepo? attendaceRepo;
+        private ICoursePrerequisiteRepository ? coursePrerequisiteRepo ;
 
         public UnitOfWork(AppDbContext context)
         {
@@ -38,6 +39,7 @@ namespace SSIS.DAL.UnitOfWork
         public IFeeRepo Fees => feeRepo ??= new FeeRepo(_context);
         public INotficationRepo notfications => notficationRepo ??= new NotficationRepo(_context);
         public IAttendaceRepo attendace => attendaceRepo ??= new AttendanceRepo(_context);
+        public ICoursePrerequisiteRepository coursePrerequisite => coursePrerequisiteRepo ??= new CoursePrerequisiteRepository(_context);
 
         IRepository<Grade> IUnitOfWork.Grades => Grades;
 

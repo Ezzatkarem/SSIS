@@ -49,6 +49,7 @@ namespace SSIS.BLL.Services.Implementaion
             grade.GradeLetter = GetGradeLatter(gradeDTO.Score);
             await _unitOfWork.Grades.AddAsync(grade);
             await _unitOfWork.SaveChangesAsync();
+            await StoreGpaForStudentAsync(grade.StudentId);
             return new Responce<GradeDTO>(mapper.Map<GradeDTO>(grade), true, "Grade entered successfully");
         }
         #region GetGradeLatter
@@ -89,6 +90,8 @@ namespace SSIS.BLL.Services.Implementaion
                 grade.UpdatedAt = DateTime.UtcNow;
                 _gradeRepository.UpdateAsync(grade);
                 await _unitOfWork.SaveChangesAsync();
+                await StoreGpaForStudentAsync(grade.StudentId);
+
                 return new Responce<UpdateGradeDTO>(gradeDTO, true, "Grade updated successfully");
 
 
@@ -134,6 +137,8 @@ namespace SSIS.BLL.Services.Implementaion
             }
             _gradeRepository.DeleteAsync(grade);
             await _unitOfWork.SaveChangesAsync();
+            await StoreGpaForStudentAsync(grade.StudentId);
+
             return new Responce<bool>(true, true, "Grade deleted successfully");
         }
         #endregion
@@ -154,81 +159,128 @@ namespace SSIS.BLL.Services.Implementaion
             }
             return new Responce<List<GradeDTO>>(mapper.Map<List<GradeDTO>>(grades), true, "Grades retrieved successfully");
 
-        } 
+        }
         #endregion
 
         #region CalculateGpaAsync
-        public async Task<Responce<GpaResponce>> CalculateGpaAsync(Guid studintId,int? semester=null,int? academicYear=null)
+        public async Task<Responce<GpaResponce>> CalculateGpaAsync(Guid studentId, int? semester = null, int? academicYear = null)
         {
-            var student = await userRepo.GetByIdAsync(studintId);
+            var student = await userRepo.GetByIdAsync(studentId);
             if (student == null)
             {
                 return new Responce<GpaResponce>(null, false, "Student not found");
             }
-            var grades = await _gradeRepository.GetByStudentIdAsync(studintId, semester ?? 0, academicYear ?? 0);
-            if (grades == null || !grades.Any())
-            {
-                return new Responce<GpaResponce>(null, false, "No grades found for this student");
-            }
-            var sortedGrades = grades.OrderBy(g => g.AcademicYear).ThenBy(g => g.Semester).ToList();
-            var targetsemester = semester ?? sortedGrades.Last().Semester;
-            var targetAcademicYear = academicYear ?? sortedGrades.Last().AcademicYear;
-            var totalCredits = 0;
-            var totalPoints = 0m;
-            
-            decimal semesterPoints = 0m;
-            int semesterCredits = 0;
-            foreach (var item in grades)
-            {
-                int gradepoints;
-                if(item.GradeLetter == GradeLetter.A)
-                {
-                    gradepoints = 4;
-                }
-                else if (item.GradeLetter == GradeLetter.B)
-                {
-                    gradepoints = 3;
-                }
-                else if (item.GradeLetter == GradeLetter.C)
-                {
-                    gradepoints = 2;
-                }
-                else if (item.GradeLetter == GradeLetter.D)
-                {
-                    gradepoints = 1;
-                }
-                else
-                {
-                    gradepoints = 0;
-                }
-                item.Course.Credits = (semester==1?1: item.Course.Credits);
-                totalPoints += gradepoints * (item.Course.Credits);
-                totalCredits += item.Course.Credits;
-                if (item.Semester == targetsemester && item.AcademicYear == targetAcademicYear) 
-                {
-                    semesterPoints += gradepoints * item.Course.Credits;
-                    semesterCredits += item.Course.Credits;
-                }
 
-               
+            int targetSemester;
+            int targetYear;
+
+            if (semester.HasValue && academicYear.HasValue)
+            {
+                targetSemester = semester.Value;
+                targetYear = academicYear.Value;
             }
-            var smasterGpa = (semesterCredits>0? semesterPoints / semesterCredits:0);
-            var cumulativeGpa =(totalCredits>0? totalPoints / totalCredits:0);
+            else
+            {
+                var lastEnrollment = await _enrollmentRepository.GetLAstEnrollmentByStudentAsync(studentId);
+                if (lastEnrollment == null)
+                {
+                    return new Responce<GpaResponce>(null, false, "No enrollments found");
+                }
+                targetSemester = lastEnrollment.Semester;
+                targetYear = lastEnrollment.AcademicYear;
+            }
+
+            var enrollment = await _enrollmentRepository.GetByStudentAndSemesterAsync(studentId, targetSemester, targetYear);
+            var semesterGpa = enrollment?.SemesterGpa ?? 0;
+            var cumulativeGpa = student.ComulativeGpa ?? 0;
+            var totalCredits = student.TotalCompletedCredits;
 
             return new Responce<GpaResponce>(new GpaResponce
             {
-                SemesterGpa = Math.Round(smasterGpa, 2),
+                SemesterGpa = Math.Round(semesterGpa, 2),
                 CumulativeGpa = Math.Round(cumulativeGpa, 2),
                 TotalCredits = totalCredits,
-                Semester = targetsemester,
-                AcademicYear = targetAcademicYear
-            }, true, "GPA calculated successfully");
-
+                Semester = targetSemester,
+                AcademicYear = targetYear
+            }, true, "GPA retrieved successfully");
         }
-
-
         #endregion
 
+
+        #region StoreGpaForStudent
+        private async Task StoreGpaForStudentAsync(Guid studentId)
+        {
+            var grades = await _gradeRepository.GetByStudentIdAsync(studentId);
+            if (!grades.Any()) return;
+
+            var bySemester = grades.GroupBy(g => new { g.Semester, g.AcademicYear });
+
+            foreach (var semesterGroup in bySemester)
+            {
+                decimal semesterPoints = 0;
+                int semesterCredits = 0;
+
+                foreach (var grade in semesterGroup)
+                {
+                    int gradePoints = grade.GradeLetter switch
+                    {
+                        GradeLetter.A => 4,
+                        GradeLetter.B => 3,
+                        GradeLetter.C => 2,
+                        GradeLetter.D => 1,
+                        GradeLetter.F => 0,
+                        _ => 0
+                    };
+
+                    semesterPoints += gradePoints * grade.Course.Credits;
+                    semesterCredits += grade.Course.Credits;
+                }
+
+                var semesterGpa = semesterCredits > 0 ? semesterPoints / semesterCredits : 0;
+
+                var enrollment = await _enrollmentRepository
+                    .GetByStudentAndSemesterAsync(studentId, semesterGroup.Key.Semester, semesterGroup.Key.AcademicYear);
+
+                if (enrollment != null)
+                {
+                    enrollment.SemesterGpa = Math.Round(semesterGpa, 2);
+                    enrollment.TotalCredits = semesterCredits;
+                    await _enrollmentRepository.UpdateAsync(enrollment);
+                }
+            }
+
+            decimal totalPoints = 0;
+            int totalCredits = 0;
+
+            foreach (var grade in grades)
+            {
+                int gradePoints = grade.GradeLetter switch
+                {
+                    GradeLetter.A => 4,
+                    GradeLetter.B => 3,
+                    GradeLetter.C => 2,
+                    GradeLetter.D => 1,
+                    GradeLetter.F => 0,
+                    _ => 0
+                };
+
+                totalPoints += gradePoints * grade.Course.Credits;
+                totalCredits += grade.Course.Credits;
+            }
+
+            var cumulativeGpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
+
+            var student = await userRepo.GetByIdAsync(studentId);
+            if (student != null)
+            {
+                student.ComulativeGpa = Math.Round(cumulativeGpa, 2);
+                student.TotalCompletedCredits = totalCredits;
+                await userRepo.UpdateAsync(student);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+#endregion   
         public async Task<Responce<GradeDTO>> GetgradeBYIdAsync (Guid gradeid)
         {
             var grade= await _unitOfWork.Grades.GetByIdAsync(gradeid);

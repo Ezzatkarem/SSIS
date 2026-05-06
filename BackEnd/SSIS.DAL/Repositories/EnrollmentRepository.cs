@@ -23,6 +23,13 @@ namespace SSIS.DAL.Repositories
                 .Include(e => e.Student)
                 .ToListAsync();
         }
+        public async Task<List<Guid>> GetCourseIdsByStudentAsync(Guid studentId)
+        {
+            return await _context.Enrollments
+                .Where(e => e.StudentId == studentId && e.IsActive)
+                .Select(e => e.CourseId)
+                .ToListAsync();
+        }
 
         public async Task<IReadOnlyList<Enrollment>> GetByCourseAsync(Guid courseId)
         {
@@ -58,6 +65,24 @@ namespace SSIS.DAL.Repositories
             return await _context.Enrollments
                 .Where(e => courseIds.Contains(e.CourseId))
                 .ToListAsync();
+        }
+
+        public async Task<Enrollment?> GetByStudentAndSemesterAsync(Guid studentId, int semester, int AcedemicYear)
+        {
+            return await _context.Enrollments
+               .FirstOrDefaultAsync(p => p.StudentId == studentId
+                                      && p.Semester == semester
+                                      && p.AcademicYear == AcedemicYear);
+        }
+
+        public async Task<Enrollment?> GetLAstEnrollmentByStudentAsync(Guid studentId)
+        {
+            return await _context.Enrollments
+                .Where(p => p.StudentId == studentId)
+                .OrderByDescending(e => e.AcademicYear)
+                .ThenByDescending(e => e.Semester)
+                .FirstOrDefaultAsync();
+            
         }
     }
 }

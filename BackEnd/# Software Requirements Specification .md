@@ -17,16 +17,33 @@
 
 ---
 
+## 📋 Table of Contents
+
+- [1. Introduction](#1-introduction)
+- [2. Actors and Roles](#2-actors-and-roles)
+- [3. Functional Requirements](#3-functional-requirements)
+- [4. Non-Functional Requirements](#4-non-functional-requirements)
+- [5. API Endpoints](#5-api-endpoints-initial)
+- [6. Database Design](#6-database-design-initial-tables)
+- [7. Technology Stack](#7-technology-stack)
+- [8. Project Structure](#8-project-structure)
+- [9. Success Criteria](#9-success-criteria)
+
+---
+
 ## 1. Introduction
 
 ### 1.1 Purpose
+
 The Smart Student Management System is a comprehensive web API solution designed to manage academic operations including student records, courses, grades, attendance, fees, and notifications.
 
 ### 1.2 Scope
+
 The system will serve three types of users:
-- **Admin**: Full system control
-- **Doctor**: Course and student management
-- **Student**: View personal academic information
+
+- **Admin** — Full system control
+- **Doctor** — Course and student management
+- **Student** — View personal academic information
 
 ### 1.3 Definitions
 
@@ -145,33 +162,34 @@ The system will serve three types of users:
 
 | Method | Endpoint | Description | Access |
 |--------|----------|-------------|--------|
-| POST | `/api/v1/auth/login` | User login | All |
-| POST | `/api/v1/auth/register` | Create new user | Admin |
+| `POST` | `/api/v1/auth/login` | User login | All |
+| `POST` | `/api/v1/auth/register` | Create new user | Admin |
 
 ### 5.2 Users
 
 | Method | Endpoint | Description | Access |
 |--------|----------|-------------|--------|
-| GET | `/api/v1/users` | Get all users | Admin |
-| GET | `/api/v1/users/{id}` | Get user by ID | Role-based |
-| PUT | `/api/v1/users/{id}` | Update user | Role-based |
-| DELETE | `/api/v1/users/{id}` | Delete user | Admin |
-| POST | `/api/v1/users/{id}/change-password` | Change password | Owner |
+| `GET` | `/api/v1/users` | Get all users | Admin |
+| `GET` | `/api/v1/users/{id}` | Get user by ID | Role-based |
+| `PUT` | `/api/v1/users/{id}` | Update user | Role-based |
+| `DELETE` | `/api/v1/users/{id}` | Delete user | Admin |
+| `POST` | `/api/v1/users/{id}/change-password` | Change password | Owner |
 
 ---
 
 ## 6. Database Design (Initial Tables)
 
-### 6.1 Users Table (via Identity)
+### 6.1 Users Table
+
 | Column | Type | Description |
 |--------|------|-------------|
-| Id | Guid | Primary key |
-| FullName | NVARCHAR(100) | User's full name |
-| Email | NVARCHAR(200) | Unique email |
-| PasswordHash | NVARCHAR(255) | Hashed password |
-| Role | INT | 1=Admin, 2=Doctor, 3=Student |
-| PhoneNumber | NVARCHAR(20) | Optional |
-| IsActive | BIT | Account status |
+| `Id` | Guid | Primary key |
+| `FullName` | NVARCHAR(100) | User's full name |
+| `Email` | NVARCHAR(200) | Unique email |
+| `PasswordHash` | NVARCHAR(255) | Hashed password |
+| `Role` | INT | 1=Admin, 2=Doctor, 3=Student |
+| `PhoneNumber` | NVARCHAR(20) | Optional |
+| `IsActive` | BIT | Account status |
 
 ---
 
@@ -193,30 +211,8 @@ The system will serve three types of users:
 
 ```
 SmartStudentSystem/
-├── SmartStudentSystem.Domain/     # Entities, Enums
-├── SmartStudentSystem.DAL/        # Identity, Repositories, UnitOfWork
-├── SmartStudentSystem.BLL/        # Services, DTOs, Validators
-└── SmartStudentSystem.API/        # Controllers, Middleware
-```
-
----
-
-## 9. Success Criteria
-
-1. Admin can create users and courses
-2. Doctor can enter grades and attendance
-3. Student can view grades and attendance
-4. JWT authentication works correctly
-5. API documented with Swagger
-6. Response time under 200ms
-
----
-
-
-
-SmartStudentSystem/
 │
-├── SmartStudentSystem.Domain/              # مشترك بين DAL و BLL
+├── SmartStudentSystem.Domain/              # Shared between DAL & BLL
 │   ├── Common/
 │   │   └── BaseEntity.cs
 │   ├── Entities/
@@ -274,4 +270,15 @@ SmartStudentSystem/
     ├── appsettings.json
     ├── appsettings.Development.json
     └── Program.cs
-**End of SRS**
+```
+
+---
+
+## 9. Success Criteria
+
+1. Admin can create users and courses
+2. Doctor can enter grades and attendance
+3. Student can view grades and attendance
+4. JWT authentication works correctly
+5. API documented with Swagger
+6. Response time under 200ms

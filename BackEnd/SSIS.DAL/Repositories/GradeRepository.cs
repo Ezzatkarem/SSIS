@@ -29,7 +29,13 @@ namespace SSIS.DAL.Repositories
              .Include(g => g.Student)
              .ToListAsync();
         }
-
+        public async Task<List<Guid>> GetPassedCourseIdsByStudentAsync(Guid studentId, decimal passingScore)
+        {
+            return await _context.Grades
+                .Where(g => g.StudentId == studentId && g.Score >= passingScore)
+                .Select(g => g.CourseId)
+                .ToListAsync();
+        }
         public async Task<IEnumerable<Grade>> GetByStudentIdAndCourseIdAsync(Guid studentId, Guid courseId, int semester)
         {
             return await _context.Grades.Where( p=>p.StudentId == studentId && p.CourseId == courseId && p.Semester == semester).ToListAsync();
@@ -41,6 +47,14 @@ namespace SSIS.DAL.Repositories
             .Where(g => g.StudentId == studentId&&g.Semester==semester&&g.AcademicYear==academicYear)
             .Include(g => g.Course)
             .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Grade>> GetByStudentIdAsync(Guid studentId)
+        {
+            return await _context.Grades
+           .Where(g => g.StudentId == studentId )
+           .Include(g => g.Course)
+           .ToListAsync();
         }
     }
 }

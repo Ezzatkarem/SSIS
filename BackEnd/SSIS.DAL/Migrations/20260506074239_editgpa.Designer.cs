@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSIS.DAL.Data;
 
@@ -11,9 +12,11 @@ using SSIS.DAL.Data;
 namespace SSIS.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260506074239_editgpa")]
+    partial class editgpa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -292,8 +295,9 @@ namespace SSIS.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("AcademicYear")
-                        .HasColumnType("int");
+                    b.Property<string>("AcademicYear")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -327,8 +331,9 @@ namespace SSIS.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Semester")
-                        .HasColumnType("int");
+                    b.Property<string>("Semester")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -338,33 +343,6 @@ namespace SSIS.DAL.Migrations
                     b.HasIndex("DoctorId");
 
                     b.ToTable("Courses");
-                });
-
-            modelBuilder.Entity("SSIS.Domain.Entities.CoursePrerequesite", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("Courseid")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PrerequesiteCourseid")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Courseid");
-
-                    b.HasIndex("PrerequesiteCourseid");
-
-                    b.ToTable("coursePrerequesites");
                 });
 
             modelBuilder.Entity("SSIS.Domain.Entities.Enrollment", b =>
@@ -853,25 +831,6 @@ namespace SSIS.DAL.Migrations
                     b.Navigation("Doctor");
                 });
 
-            modelBuilder.Entity("SSIS.Domain.Entities.CoursePrerequesite", b =>
-                {
-                    b.HasOne("SSIS.Domain.Entities.Course", "Course")
-                        .WithMany("Prerequesites")
-                        .HasForeignKey("Courseid")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SSIS.Domain.Entities.Course", "PrerequesiteCourse")
-                        .WithMany("RequiredFor")
-                        .HasForeignKey("PrerequesiteCourseid")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Course");
-
-                    b.Navigation("PrerequesiteCourse");
-                });
-
             modelBuilder.Entity("SSIS.Domain.Entities.Enrollment", b =>
                 {
                     b.HasOne("SSIS.Domain.Entities.Course", "Course")
@@ -971,10 +930,6 @@ namespace SSIS.DAL.Migrations
                     b.Navigation("Enrollments");
 
                     b.Navigation("Grades");
-
-                    b.Navigation("Prerequesites");
-
-                    b.Navigation("RequiredFor");
 
                     b.Navigation("Schedules");
                 });

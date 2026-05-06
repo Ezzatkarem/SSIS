@@ -13,6 +13,11 @@ namespace SSIS.Domain.Entities
         public DateTime EnrollmentDate { get; set; }
         public bool IsActive { get; set; } = true;
 
+        public int Semester { get; set; }
+        public int AcademicYear { get; set; }
+        public decimal? SemesterGpa { get; set; }
+        public int TotalCredits { get; set; }
+
         // Navigation properties
         public User Student { get; set; } = null!;
         public Course Course { get; set; } = null!;

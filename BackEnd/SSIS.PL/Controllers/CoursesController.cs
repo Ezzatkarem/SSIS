@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Paymob.Net.Models;
 using SSIS.BLL.DTOs;
 using SSIS.BLL.DTOs.Courses;
 using SSIS.BLL.Services.Interfaces;
@@ -100,6 +101,34 @@ namespace SSIS.PL.Controllers
             return NoContent();
         }
         #endregion
+        [HttpGet("avilable-for-me")]
+        [Authorize(Roles ="Student")]
+        public async Task<IActionResult> GetAvilableCourseForStudent()
+        {
+            var studentid  = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value!);
+            await _courseService.GetAvailableCoursesForStudentAsync(studentid);
+            return Ok(studentid);
+        }
+        [HttpPost("with-pre")]
+        [Authorize(Roles ="Admin")]
+        public async Task<IActionResult> CreateCourseWithPrereqAsync(CreateCourseWithPrereqDto dto)
+        {
+            var course=await _courseService.CreateWithPrereqAsync(dto);
+            if (course == null)
+                return BadRequest(new { message = "Course code alrady exists" });
+            return Ok(course);
+        }
+
+        [HttpPost("self-enroll/{courseId}")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> SelfEnroll(Guid courseId)
+        {
+            var studentId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value!);
+            var (success, message) = await _courseService.SelfEnrollAsync(studentId, courseId);
+            if (!success)
+                return BadRequest(new { message });
+            return Ok(new { message });
+        }
 
         #region AssignDoctor
         [HttpPost("{id:guid}/assign-doctor")]

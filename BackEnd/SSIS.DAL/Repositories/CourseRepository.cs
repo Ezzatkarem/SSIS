@@ -37,7 +37,7 @@ namespace SSIS.DAL.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Course>> GetBySemesterAsync(string semester, string academicYear)
+        public async Task<IReadOnlyList<Course>> GetBySemesterAsync(int semester, int academicYear)
         {
             return await _context.Courses
                 .Where(c => c.Semester == semester && c.AcademicYear == academicYear && !c.IsDeleted)

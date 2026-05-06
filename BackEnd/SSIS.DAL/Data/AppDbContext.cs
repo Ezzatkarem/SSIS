@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SSIS.DAL.Identity;
 using SSIS.Domain.Entities;
@@ -22,6 +23,7 @@ namespace SSIS.DAL.Data
         public DbSet<Payment> Payments  { get; set; }
         public DbSet<Fee> Fees { get; set; }
         public DbSet<Attendance> Attendances { get; set; }
+        public DbSet<CoursePrerequesite> coursePrerequesites { get; set; }
 
         public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
@@ -39,6 +41,21 @@ namespace SSIS.DAL.Data
     .WithMany()
     .HasForeignKey(p => p.StudentId)
     .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<CoursePrerequesite>()
+                .HasKey(c => c.Id);
+
+            builder.Entity<CoursePrerequesite>()
+                .HasOne(p => p.Course)
+                .WithMany(p => p.Prerequesites)
+                .HasForeignKey(p => p.Courseid)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CoursePrerequesite>()
+                           .HasOne(p => p.PrerequesiteCourse)
+                           .WithMany(p => p.RequiredFor)
+                           .HasForeignKey(p => p.PrerequesiteCourseid)
+                           .OnDelete(DeleteBehavior.Restrict);                
         }
     }
 }

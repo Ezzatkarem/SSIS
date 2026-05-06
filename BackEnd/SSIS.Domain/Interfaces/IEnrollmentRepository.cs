@@ -13,5 +13,8 @@ namespace SSIS.Domain.Interfaces
         Task<bool> ExistsAsync(Guid studentId, Guid courseId);
         Task<Enrollment?> GetByStudentAndCourseAsync(Guid studentId, Guid courseId);
         Task<IReadOnlyList<Enrollment>> GetByCourseIdsAsync(List<Guid> courseIds);
+        Task<Enrollment?> GetByStudentAndSemesterAsync(Guid studentId, int semester,int AcedemicYear);
+        Task<Enrollment?> GetLAstEnrollmentByStudentAsync (Guid studentId);
+        Task<List<Guid>> GetCourseIdsByStudentAsync(Guid studentId);
     }
 }

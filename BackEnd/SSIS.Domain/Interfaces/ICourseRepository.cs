@@ -10,7 +10,7 @@ namespace SSIS.Domain.Interfaces
         Task<IReadOnlyList<Course>> GetByDoctorAsync(Guid doctorId);
         Task<Course?> GetByCodeAsync(string code);
         Task<IReadOnlyList<Course>> GetActiveCoursesAsync();
-        Task<IReadOnlyList<Course>> GetBySemesterAsync(string semester, string academicYear);
+        Task<IReadOnlyList<Course>> GetBySemesterAsync(int semester, int academicYear);
         Task<bool> CodeExistsAsync(string code);
     }
 }

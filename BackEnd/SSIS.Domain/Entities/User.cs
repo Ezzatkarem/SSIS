@@ -15,6 +15,8 @@ namespace SSIS.Domain.Entities
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
 
+        public decimal? ComulativeGpa { get; set; }
+        public int TotalCompletedCredits { get; set; }
         public string IdentityUserId { get; set; } = string.Empty;
 
         //Student

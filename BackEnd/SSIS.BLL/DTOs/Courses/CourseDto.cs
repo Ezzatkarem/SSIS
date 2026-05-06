@@ -9,8 +9,8 @@ namespace SSIS.BLL.DTOs.Courses
         public string? Description { get; set; }
         public Guid? DoctorId { get; set; }
         public string? DoctorName { get; set; }
-        public string Semester { get; set; } = string.Empty;
-        public string AcademicYear { get; set; } = string.Empty;
+        public int Semester { get; set; } 
+        public int AcademicYear { get; set; } 
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
